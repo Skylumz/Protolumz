@@ -30,9 +30,13 @@
         {
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.SearchTextBox = new System.Windows.Forms.TextBox();
+            this.SearchLabel = new System.Windows.Forms.Label();
             this.MainTreeView = new System.Windows.Forms.TreeView();
             this.TreeViewContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.openHexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.extractDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.MainPropertyGrid = new System.Windows.Forms.PropertyGrid();
@@ -41,8 +45,8 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extractCheckedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainStatusStrip = new System.Windows.Forms.StatusStrip();
-            this.extractDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.extractOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -51,6 +55,7 @@
             this.MainTabControl.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.MainMenuStrip.SuspendLayout();
+            this.MainStatusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -61,6 +66,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.SearchTextBox);
+            this.splitContainer1.Panel1.Controls.Add(this.SearchLabel);
             this.splitContainer1.Panel1.Controls.Add(this.MainTreeView);
             // 
             // splitContainer1.Panel2
@@ -70,14 +77,35 @@
             this.splitContainer1.SplitterDistance = 348;
             this.splitContainer1.TabIndex = 0;
             // 
+            // SearchTextBox
+            // 
+            this.SearchTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SearchTextBox.Location = new System.Drawing.Point(62, 6);
+            this.SearchTextBox.Name = "SearchTextBox";
+            this.SearchTextBox.Size = new System.Drawing.Size(283, 20);
+            this.SearchTextBox.TabIndex = 2;
+            this.SearchTextBox.TextChanged += new System.EventHandler(this.SearchTextBox_TextChanged);
+            // 
+            // SearchLabel
+            // 
+            this.SearchLabel.AutoSize = true;
+            this.SearchLabel.Location = new System.Drawing.Point(12, 9);
+            this.SearchLabel.Name = "SearchLabel";
+            this.SearchLabel.Size = new System.Drawing.Size(44, 13);
+            this.SearchLabel.TabIndex = 1;
+            this.SearchLabel.Text = "Search:";
+            // 
             // MainTreeView
             // 
+            this.MainTreeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.MainTreeView.CheckBoxes = true;
             this.MainTreeView.ContextMenuStrip = this.TreeViewContextMenu;
-            this.MainTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainTreeView.Location = new System.Drawing.Point(0, 0);
+            this.MainTreeView.Location = new System.Drawing.Point(3, 32);
             this.MainTreeView.Name = "MainTreeView";
-            this.MainTreeView.Size = new System.Drawing.Size(348, 426);
+            this.MainTreeView.Size = new System.Drawing.Size(342, 369);
             this.MainTreeView.TabIndex = 0;
             this.MainTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.MainTreeView_AfterSelect);
             // 
@@ -86,9 +114,10 @@
             this.TreeViewContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openHexToolStripMenuItem,
             this.toolStripSeparator1,
-            this.extractDataToolStripMenuItem});
+            this.extractDataToolStripMenuItem,
+            this.extractOBJToolStripMenuItem});
             this.TreeViewContextMenu.Name = "TreeViewContextMenu";
-            this.TreeViewContextMenu.Size = new System.Drawing.Size(181, 76);
+            this.TreeViewContextMenu.Size = new System.Drawing.Size(181, 98);
             // 
             // openHexToolStripMenuItem
             // 
@@ -96,6 +125,18 @@
             this.openHexToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openHexToolStripMenuItem.Text = "Open Hex";
             this.openHexToolStripMenuItem.Click += new System.EventHandler(this.openHexToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            // 
+            // extractDataToolStripMenuItem
+            // 
+            this.extractDataToolStripMenuItem.Name = "extractDataToolStripMenuItem";
+            this.extractDataToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.extractDataToolStripMenuItem.Text = "Extract Data";
+            this.extractDataToolStripMenuItem.Click += new System.EventHandler(this.extractDataToolStripMenuItem_Click);
             // 
             // MainTabControl
             // 
@@ -157,23 +198,25 @@
             // 
             // MainStatusStrip
             // 
+            this.MainStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.StatusLabel});
             this.MainStatusStrip.Location = new System.Drawing.Point(0, 428);
             this.MainStatusStrip.Name = "MainStatusStrip";
             this.MainStatusStrip.Size = new System.Drawing.Size(800, 22);
             this.MainStatusStrip.TabIndex = 2;
             this.MainStatusStrip.Text = "statusStrip1";
             // 
-            // extractDataToolStripMenuItem
+            // StatusLabel
             // 
-            this.extractDataToolStripMenuItem.Name = "extractDataToolStripMenuItem";
-            this.extractDataToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.extractDataToolStripMenuItem.Text = "Extract Data";
-            this.extractDataToolStripMenuItem.Click += new System.EventHandler(this.extractDataToolStripMenuItem_Click);
+            this.StatusLabel.Name = "StatusLabel";
+            this.StatusLabel.Size = new System.Drawing.Size(0, 17);
             // 
-            // toolStripSeparator1
+            // extractOBJToolStripMenuItem
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.extractOBJToolStripMenuItem.Name = "extractOBJToolStripMenuItem";
+            this.extractOBJToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.extractOBJToolStripMenuItem.Text = "Extract OBJ";
+            this.extractOBJToolStripMenuItem.Click += new System.EventHandler(this.extractOBJToolStripMenuItem_Click);
             // 
             // P3DForm
             // 
@@ -186,6 +229,7 @@
             this.Name = "P3DForm";
             this.Text = "P3D Viewer - by Skylumz";
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
@@ -194,6 +238,8 @@
             this.tabPage2.ResumeLayout(false);
             this.MainMenuStrip.ResumeLayout(false);
             this.MainMenuStrip.PerformLayout();
+            this.MainStatusStrip.ResumeLayout(false);
+            this.MainStatusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -215,5 +261,9 @@
         private System.Windows.Forms.PropertyGrid MainPropertyGrid;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem extractDataToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
+        private System.Windows.Forms.TextBox SearchTextBox;
+        private System.Windows.Forms.Label SearchLabel;
+        private System.Windows.Forms.ToolStripMenuItem extractOBJToolStripMenuItem;
     }
 }

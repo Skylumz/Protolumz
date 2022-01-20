@@ -634,7 +634,8 @@ namespace Protolumz
 
                 if (item.Tag is DirectoryInfo)
                 {
-                    var t = SelectNode(item.Text, SelectedNode);
+                    var dir = item.Tag as DirectoryInfo;
+                    var t = SelectNode(dir.FullName);
                     return;
                 }
                 else if (item.Tag is FileInfo)
@@ -706,17 +707,17 @@ namespace Protolumz
         private void OpenP3DForm(string filepath, byte[] data)
         {
             P3DForm form = new P3DForm(this, filepath, data);
-            form.Show();
+            form.Show(this);
         }
         private void OpenTextForm(string filepath, byte[] data)
         {
             TextEditorForm form = new TextEditorForm(this, filepath, data);
-            form.Show();
+            form.Show(this);
         }
         private void OpenHexForm(string filepath, byte[] data)
         {
             HexEditorForm form = new HexEditorForm(this, filepath, data);
-            form.Show();
+            form.Show(this);
         }
         
 

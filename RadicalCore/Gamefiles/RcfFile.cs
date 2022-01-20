@@ -50,15 +50,18 @@ namespace RadicalCore.Gamefiles
 
                 //assign entries names from name table
                 UpdateStatus("Assigning name tables to " + Name + "...");
+
+                var hashedNameTables = NameTables.ToDictionary(x => HashUtil.HashString(x.Name, 0));
                 foreach (var entry in Entries)
                 {
-                    var nt = GetNameTable(entry);
-                    if (nt == null)
+                    if (hashedNameTables.TryGetValue(entry.NameHash, out var nameTable))
+                    {
+                        entry.NameTable = nameTable;
+                    }
+                    else
                     {
                         throw new Exception("Didn't find name table for entry.");
                     }
-
-                    entry.NameTable = nt;
                 }
 
                 UpdateStatus("Building directory tree for " + Name + "...");
@@ -172,34 +175,6 @@ namespace RadicalCore.Gamefiles
 
             entry.Data = data;
             return data;
-        }
-
-        private RcfNameTable GetNameTable(RcfEntry entry)
-        {
-            string name = HashUtil.GetString(entry.NameHash);
-            foreach (var nt in NameTables)
-            {
-                if (nt.found) continue;
-                if (string.IsNullOrEmpty(name))
-                {
-                    var hashed = HashUtil.HashString(nt.Name, 0);
-                    if (hashed == entry.NameHash)
-                    {
-                        nt.found = true;
-                        return nt;
-                    }
-                }
-                else
-                {
-                    if (nt.Name == name)
-                    {
-                        nt.found = true;
-                        return nt;
-                    }
-                }
-
-            }
-            return null;
         }
 
         private void BuildDirectoryTree()

@@ -16,22 +16,14 @@ namespace RadicalCore.Gamefiles
         public volatile bool inited = false;
 
         public void Init(string path, Action<string> us, Action<string> le)
-    {
+        {
             AllRcfs.Clear();
             UpdateStatus = us;
             LogError = le;
 
-            if (!HashUtil.inited)
-            {
-                UpdateStatus("Building hash index...");
-                HashUtil.BuildHashDictionary();
-            }
-
             var files = Directory.GetFiles(path, "*.rcf*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
-                if (file.Contains("german")) continue;
-
                 var rcf = new RcfFile(file);
                 us("Scanning: " + rcf.Name);
                 rcf.Load(us, LogError);

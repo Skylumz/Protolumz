@@ -9,37 +9,6 @@ namespace RadicalCore
 {
     public static class HashUtil
     {
-        public static Dictionary<uint, string> KnownFileNameHashes;
-        public static volatile bool inited = false;
-
-        public static void BuildHashDictionary()
-        {
-            if (KnownFileNameHashes != null) return;
-            KnownFileNameHashes = new Dictionary<uint, string>();
-            var lines = File.ReadAllLines("hashes.txt");
-            foreach(var line in lines)
-            {
-                if(string.IsNullOrEmpty(line)) continue;
-                var kv = line.Split('=');
-                var key = uint.Parse(kv[0].Trim());
-                var value = kv[1].Trim();
-                KnownFileNameHashes.Add(key, value);
-            }
-
-            inited = true;
-        }
-
-        public static string GetString(uint hash)
-        {
-            if (KnownFileNameHashes == null) return "";
-            string result = "";
-            if (KnownFileNameHashes.ContainsKey(hash))
-            {
-                result = KnownFileNameHashes[hash];
-            }
-            return result;
-        }
-
         public static uint HashString(string str, uint seed)
         {
             if (str.StartsWith(@"\") == true)

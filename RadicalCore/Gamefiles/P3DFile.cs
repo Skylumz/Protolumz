@@ -47,7 +47,7 @@ namespace RadicalCore.Gamefiles
             Nodes = new List<P3DNode>();
             while (dr.Position < FileSize)
             {
-                var node = P3DNode.ReadNode(dr, null);
+                var node = P3DNode.ReadNode(dr, this, null);
                 Nodes.Add(node);
             }
 
@@ -60,6 +60,26 @@ namespace RadicalCore.Gamefiles
         public void Write(DataReader dr)
         {
             throw new NotImplementedException();
+        }
+
+        public List<P3DNode> GetNodes(P3DNode node)
+        {
+            var nodes = new List<P3DNode>();
+            nodes.Add(node);
+            foreach(var cn in node.Children)
+            {
+                nodes.AddRange(GetNodes(cn));
+            }
+            return nodes;
+        }
+        public List<P3DNode> GetAllNodes()
+        {
+            var nodes = new List<P3DNode>();
+            foreach (var node in Nodes)
+            {
+                nodes.AddRange(GetNodes(node));
+            }
+            return nodes;
         }
     }
 
@@ -118,6 +138,12 @@ namespace RadicalCore.Gamefiles
         ShaderGlobalVariable = 69645,
         ShaderProgram = 69643,
         ShaderTemplate = 69641,
+        ShaderTemplate_unk1 = 69642,
+        ShaderTemplate_unk2 = 69646,
+        ShaderTemplate_unk3 = 69717,
+        ShaderTemplate_unk4 = 69647,
+        ShaderTemplate_unk5 = 69715,
+        ShaderTemplate_unk6 = 69718,
 
         U00010020_PrimitiveGroup = 65568,
         
@@ -163,7 +189,7 @@ namespace RadicalCore.Gamefiles
             throw new NotImplementedException();
         }
 
-        public static P3DNode ReadNode(DataReader dr, P3DNode parent)
+        public static P3DNode ReadNode(DataReader dr, P3DFile owner, P3DNode parent)
         {
             var start = dr.Position;
 
@@ -264,12 +290,32 @@ namespace RadicalCore.Gamefiles
                 case P3DNodeType.PolySkin:
                     node = new PolySkinNode();
                     break;
+
                 case P3DNodeType.ShaderProgram:
                     node = new ShaderProgramNode();
                     break;
                 case P3DNodeType.ShaderTemplate:
                     node = new ShaderTemplateNode();
                     break;
+                case P3DNodeType.ShaderTemplate_unk1:
+                    node = new ShaderTemplate_unk1();
+                    break;
+                case P3DNodeType.ShaderTemplate_unk2:
+                    node = new ShaderTemplate_unk2();
+                    break;
+                case P3DNodeType.ShaderTemplate_unk3:
+                    node = new ShaderTemplate_unk3();
+                    break;
+                case P3DNodeType.ShaderTemplate_unk4:
+                    node = new ShaderTemplate_unk4();
+                    break;
+                case P3DNodeType.ShaderTemplate_unk5:
+                    node = new ShaderTemplate_unk5();
+                    break;
+                case P3DNodeType.ShaderTemplate_unk6:
+                    node = new ShaderTemplate_unk6();
+                    break;
+
                 case P3DNodeType.Skeleton:
                     node = new SkeletonNode();
                     break;
@@ -330,7 +376,6 @@ namespace RadicalCore.Gamefiles
                 case P3DNodeType.ExpressionMixer:
                     node = new ExpressionMixerNode();
                     break;
-            node.Offset = dr.Position;
             }
            
             try
@@ -342,8 +387,8 @@ namespace RadicalCore.Gamefiles
                 node.LastException = ex;
             }
 
+            node.Owner = owner;
             node.Offset = dr.Position;
-            dr.Position = start + 12; //skip header data
             node.Data = dr.ReadBytes((int)node.HeaderSize);
             dr.Position = start + node.HeaderSize;
 
@@ -358,7 +403,7 @@ namespace RadicalCore.Gamefiles
 
             while(dr.Position != end)
             {
-                var child = P3DNode.ReadNode(dr, node);
+                var child = P3DNode.ReadNode(dr, owner, node);
                 node.Children.Add(child);
             }
 
@@ -552,7 +597,7 @@ namespace RadicalCore.Gamefiles
                 case "MaterialMap":
                 case "DualDistanceSound":
                 case "SubsonicSound":
-                case "AudioDialogueSubttitle":
+                case "AudioDialogueSubtitle":
                     break;
                 default:
                     break;
@@ -566,7 +611,7 @@ namespace RadicalCore.Gamefiles
 
         public override string ToString()
         {
-            return string.Format("{0} - {1} {2} bytes", TypeName, Offset, Size);
+            return string.Format("{0} - {1} - @{2} {3} bytes", Type, TypeName, Offset, Size);
         }
     }
 
@@ -988,11 +1033,11 @@ namespace RadicalCore.Gamefiles
     public class BufferElement
     {
         public string Name { get; set; }
-        public uint Unk1 { get; set; } // data count?
-        public uint Unk2 { get; set; } // data size?
-        public uint Unk3 { get; set; }
-        public uint Unk4 { get; set; }
-        public uint Unk5 { get; set; } // buffer count?
+        public uint Unk1 { get; set; } 
+        public uint Count { get; set; } 
+        public uint Position { get; set; }
+        public uint TotalSize { get; set; }
+        public uint BufferCount { get; set; }
         public uint Unk6 { get; set; }
         public uint Unk7 { get; set; }
 
@@ -1000,10 +1045,10 @@ namespace RadicalCore.Gamefiles
         {
             Name = dr.ReadByteSizedString();
             Unk1 = dr.ReadUInt32();
-            Unk2 = dr.ReadUInt32();
-            Unk3 = dr.ReadUInt32();
-            Unk4 = dr.ReadUInt32();
-            Unk5 = dr.ReadUInt32();
+            Count = dr.ReadUInt32();
+            Position = dr.ReadUInt32();
+            TotalSize = dr.ReadUInt32();
+            BufferCount = dr.ReadUInt32();
             Unk6 = dr.ReadUInt32();
             Unk7 = dr.ReadUInt32();
         }
@@ -1256,9 +1301,9 @@ namespace RadicalCore.Gamefiles
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class TextBibleHolderNode : P3DNode
     {
-        public uint Count { get; set; }
         public string Language { get; set; }
         public uint Version { get; set; }
+        public uint Count { get; set; }
         public List<string> Keys { get; set; }
         public List<uint> StringStarts { get; set; }
         public List<uint> StringStops { get; set; }
@@ -1267,6 +1312,8 @@ namespace RadicalCore.Gamefiles
         {
             base.Read(dr);
 
+            Language = dr.ReadByteSizedString();
+            Version = dr.ReadUInt32();
             Count = dr.ReadUInt32();
             Keys = new List<string>();
             for (int i = 0; i < Count; i++)
@@ -1295,8 +1342,11 @@ namespace RadicalCore.Gamefiles
     {
         public string Unknown1 { get; set; }
         public uint Unknown2 { get; set; }
-        public uint TBDataLength { get; set; }
-        public byte[] TBData { get; set; }
+        public uint TextLength { get; set; }
+        public string Text { get; set; }
+        public uint Unknown3 { get; set; }
+        public uint Unknown4 { get; set; }
+        public uint Unknown5 { get; set; }
 
         public override void Read(DataReader dr)
         {
@@ -1304,13 +1354,16 @@ namespace RadicalCore.Gamefiles
 
             Unknown1 = dr.ReadByteSizedString();
             Unknown2 = dr.ReadUInt32();
-            TBDataLength = dr.ReadUInt32();
-            TBData = dr.ReadBytes((int)TBDataLength);
+            TextLength = dr.ReadUInt32();
+            Text = dr.ReadString((int)TextLength);
+            Unknown3 = dr.ReadUInt32();
+            Unknown4 = dr.ReadUInt32();
+            Unknown5 = dr.ReadUInt32();
         }
 
         public override string ToString()
         {
-            return string.Format("{0} - {1} bytes", Type, TBDataLength);
+            return string.Format("{0} - {1}", Type, Unknown1);
         }
     }
 
@@ -1354,6 +1407,50 @@ namespace RadicalCore.Gamefiles
             Unknown02 = dr.ReadUInt32();
             ShaderType = (ShaderProgramType)dr.ReadUInt32();
             ChildCount2 = dr.ReadUInt32();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} - {1}", Type, Name);
+        }
+    }
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public class ShaderCodeNode : P3DNode
+    {
+        public ShaderCodeType CodeType { get; set; }
+        public uint ShaderDataLength { get; set; }
+        public uint GlobalVariableCount { get; set; }
+        public byte[] ShaderData { get; set; }
+
+        public override void Read(DataReader dr)
+        {
+            base.Read(dr);
+
+            CodeType = (ShaderCodeType)dr.ReadUInt32();
+            ShaderDataLength = dr.ReadUInt32();
+            GlobalVariableCount = dr.ReadUInt32();
+            ShaderData = dr.ReadBytes((int)ShaderDataLength);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} - {1}", Type, CodeType);
+        }
+    }
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public class ShaderGlobalVariableNode : P3DNode
+    {
+        public string Name { get; set; }
+        public ShaderVariableType VariableType { get; set; }
+        public uint Register { get; set; }
+
+        public override void Read(DataReader dr)
+        {
+            base.Read(dr);
+
+            Name = dr.ReadByteSizedString();
+            VariableType = (ShaderVariableType)dr.ReadUInt32();
+            Register = dr.ReadUInt32();
         }
 
         public override string ToString()
@@ -1409,47 +1506,169 @@ namespace RadicalCore.Gamefiles
         }
     }
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public class ShaderCodeNode : P3DNode
-    {
-        public ShaderCodeType CodeType { get; set; }
-        public uint ShaderDataLength { get; set; }
-        public uint GlobalVariableCount { get; set; }
-        public byte[] ShaderData { get; set; }
-
-        public override void Read(DataReader dr)
-        {
-            base.Read(dr);
-
-            CodeType = (ShaderCodeType)dr.ReadUInt32();
-            ShaderDataLength = dr.ReadUInt32();
-            GlobalVariableCount = dr.ReadUInt32();
-            ShaderData = dr.ReadBytes((int)ShaderDataLength);
-        }
-
-        public override string ToString()
-        {
-            return string.Format("{0} - {1}", Type, CodeType);
-        }
-    }
-    [TypeConverter(typeof(ExpandableObjectConverter))]
-    public class ShaderGlobalVariableNode : P3DNode
+    public class ShaderTemplate_unk1 : P3DNode
     {
         public string Name { get; set; }
-        public ShaderVariableType VariableType { get; set; }
-        public uint Register { get; set; }
+        public uint Unknown1 { get; set; }
+        public uint Unknown2 { get; set; }
+        public uint Unknown3 { get; set; }
+        public uint Unknown4 { get; set; }
+        public string UnkStr1 { get; set; }
+        public string UnkStr2 { get; set; }
+        public P3DNodeType PointerType { get; set; } //wierd name but idk
+        public uint Unknown6 { get; set; }
+        public uint Unknown7 { get; set; }
 
         public override void Read(DataReader dr)
         {
             base.Read(dr);
 
             Name = dr.ReadByteSizedString();
-            VariableType = (ShaderVariableType)dr.ReadUInt32();
-            Register = dr.ReadUInt32();
+            Unknown1 = dr.ReadUInt32();
+            Unknown2 = dr.ReadUInt32();
+            Unknown3 = dr.ReadUInt32();
+            Unknown4 = dr.ReadUInt32();
+            UnkStr1 = dr.ReadByteSizedString();
+            UnkStr2 = dr.ReadByteSizedString();
+            PointerType = (P3DNodeType)dr.ReadUInt32();
+            Unknown6 = dr.ReadUInt32();
+            Unknown7 = dr.ReadUInt32();
         }
 
         public override string ToString()
         {
             return string.Format("{0} - {1}", Type, Name);
+        }
+    }
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public class ShaderTemplate_unk2 : P3DNode
+    {
+        public string Name { get; set; }
+        public uint Unknown1 { get; set; }
+        public uint Unknown2 { get; set; }
+        public P3DNodeType PointerType { get; set; } //wierd name but idk
+        public uint Unknown3 { get; set; }
+        public uint Unknown4 { get; set; }
+
+        public override void Read(DataReader dr)
+        {
+            base.Read(dr);
+
+            Name = dr.ReadByteSizedString();
+            Unknown1 = dr.ReadUInt32();
+            Unknown2 = dr.ReadUInt32();
+            PointerType = (P3DNodeType)dr.ReadUInt32();
+            Unknown3 = dr.ReadUInt32();
+            Unknown4 = dr.ReadUInt32();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} - {1}", Type, Name);
+        }
+    }
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public class ShaderTemplate_unk3 : P3DNode
+    {
+        public uint Unknown1 { get; set; }
+        public P3DNodeType PointerType { get; set; } //wierd name but idk
+        public uint Unknown3 { get; set; }
+        public uint Unknown4 { get; set; }
+
+        public override void Read(DataReader dr)
+        {
+            base.Read(dr);
+
+            Unknown1 = dr.ReadUInt32();
+            PointerType = (P3DNodeType)dr.ReadUInt32();
+            Unknown3 = dr.ReadUInt32();
+            Unknown4 = dr.ReadUInt32();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}", Type);
+        }
+    }
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public class ShaderTemplate_unk4 : P3DNode
+    {
+        public uint Unknown1 { get; set; }
+        public uint Unknown2 { get; set; }
+        public uint Unknown3 { get; set; }
+        public uint Unknown4 { get; set; }
+        public uint Unknown5 { get; set; }
+        public P3DNodeType PointerType { get; set; } //wierd name but idk
+        public uint Unknown7 { get; set; }
+        public uint Unknown8 { get; set; }
+
+        public override void Read(DataReader dr)
+        {
+            base.Read(dr);
+
+            Unknown1 = dr.ReadUInt32();
+            Unknown2 = dr.ReadUInt32();
+            Unknown3 = dr.ReadUInt32();
+            Unknown4 = dr.ReadUInt32();
+            Unknown5 = dr.ReadUInt32();
+            PointerType = (P3DNodeType)dr.ReadUInt32();
+            Unknown7 = dr.ReadUInt32();
+            Unknown8 = dr.ReadUInt32();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}", Type);
+        }
+    }
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public class ShaderTemplate_unk5 : P3DNode
+    {
+        public uint Unknown1 { get; set; }
+        public uint Unknown2 { get; set; }
+        public uint Unknown3 { get; set; }
+        public uint Unknown4 { get; set; }
+        public P3DNodeType PointerType { get; set; } //wierd name but idk
+        public uint Unknown5 { get; set; }
+
+        public override void Read(DataReader dr)
+        {
+            base.Read(dr);
+
+            Unknown1 = dr.ReadUInt32();
+            Unknown2 = dr.ReadUInt32();
+            Unknown3 = dr.ReadUInt32();
+            Unknown4 = dr.ReadUInt32();
+            PointerType = (P3DNodeType)dr.ReadUInt32();
+            Unknown5 = dr.ReadUInt32();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}", Type);
+        }
+    }
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public class ShaderTemplate_unk6 : P3DNode
+    {
+        public uint Unknown1 { get; set; }
+        public P3DNodeType PointerType { get; set; } //wierd name but idk
+        public uint Unknown2 { get; set; }
+        public uint Unknown3 { get; set; }
+
+        public override void Read(DataReader dr)
+        {
+            base.Read(dr);
+
+            Unknown1 = dr.ReadUInt32();
+            PointerType = (P3DNodeType)dr.ReadUInt32();
+            Unknown2 = dr.ReadUInt32();
+            Unknown3 = dr.ReadUInt32();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}", Type);
         }
     }
 
@@ -1839,85 +2058,130 @@ namespace RadicalCore.Gamefiles
 
 
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public class MetaObject
-    {
-        public uint NameLength { get; set; }
-        public string Name { get; set; }
-        public Vector3 Position { get; set; }
-        public Vector4 Rotation { get; set; }
-        public Vector3 Scale { get; set; }
-        public uint Unknown1 { get; set; }
-        public uint Unknown2 { get; set; }
-        public uint Unknown3 { get; set; }
-
-        public void Read(DataReader dr)
-        {
-            var start = dr.Position;
-
-            NameLength = dr.ReadUInt32();
-            Name = dr.ReadString((int)NameLength);
-            Position = dr.ReadVector3();
-            Rotation = dr.ReadVector4();
-            Scale = dr.ReadVector3();
-            Unknown1 = dr.ReadUInt32();
-            Unknown2 = dr.ReadUInt32();
-            Unknown3 = dr.ReadUInt32();
-
-            if (dr.Position != start + Name.Length + 56)
-            {
-                throw new Exception();
-            }
-        }
-
-        public override string ToString()
-        {
-            return string.Format("MetaObject - {0}", Name);
-        }
-    }
-    [TypeConverter(typeof(ExpandableObjectConverter))]
     public class MetaObjectDataNode : P3DNode
     {
-        public uint DataLength { get; set; }
-        public uint Identifier { get; set; }
-        
-        public uint MetaObjectCount { get; set; }
-        public List<MetaObject> MetaObjects { get; set; }
+        public uint NodeDataLength { get; set; }
+        public byte[] NodeData { get; set; }
+
 
         public override void Read(DataReader dr)
         {
             base.Read(dr);
 
-            DataLength = dr.ReadUInt32();
-            var start = dr.Position;
-            Identifier = dr.ReadUInt32();
-            
-            if (Identifier == 1096041805)
-            {
-                dr.Position -= 4;
-                dr.ReadBytes((int)DataLength);
-            }
-            else
-            {
-                MetaObjectCount = dr.ReadUInt32();
-                MetaObjects = new List<MetaObject>();
-                for (int i = 0; i < MetaObjectCount; i++)
-                {
-                    MetaObject obj = new MetaObject();
-                    obj.Read(dr);
-                    MetaObjects.Add(obj);
-                }
-            }
-
-            if (dr.Position != start + DataLength)
-            {
-                throw new Exception();
-            }
+            NodeDataLength = dr.ReadUInt32();
+            NodeData = dr.ReadBytes((int)NodeDataLength);
         }
 
         public override string ToString()
         {
-            return string.Format("{0} - {1} bytes", Type, DataLength);
+            return string.Format("{0} - {1} bytes", Type, NodeDataLength);
         }
+    }
+    public enum MetaType : uint
+    {
+        PropRestoreDataArray = 2173087383,
+
+        AchievementsManager = 3352760320,
+        StatsManager = 1704301288,
+        PersonalBestThreshold = 4086179281,
+
+        NPCInstancePool = 3529804714,
+        NPCDrawable = 1471376677,
+        NPCType = 1987898676,
+        NPCRender = 1025374863,
+        PedestrianSpawner = 1174351712,
+
+        ShaderPalette = 1359486408,
+
+        LODAnimationInfoListTemplate = 3309078827,
+        AmbientExclusionVolume = 466667055,
+        SimplePhysicsObjectFactory = 3711084174,
+        WhipFistPower = 10511182,
+        TendrilPower = 3907123361,
+        TokenWeights = 477332489,
+        DisguiseIncidentConfig = 1939985585,
+
+        SupportingLimbDefinitionList = 2879966630,
+        SupportingLimbDefinition = 508261517,
+
+        DamageScale = 104023774,
+        CharacterZoneDamageProperties = 3727486622,
+        AtlasInfo = 4085786704,
+        AirCameraTunables = 483273957,
+        ChaseCameraTunables = 2936952957,
+        SmartTargetCamera = 1624457702,
+        ChaseCameraSettings = 901321416,
+        oseMirrorPartitionLoadObject = 3408415242,
+        DismembermentCutList = 1830363640,
+        AnalyseCollisionParams = 3494946021,
+        MomentumDamageParams = 2956375238,
+        CharacterSolverProperties = 1784948523,
+        AttachmentPhysicsProperties = 1513115060,
+        ConstraintAngularVelocitySharedProperties = 1801857568,
+        ConstraintAngularSpringSharedProperties = 122490656,
+        ConstraintSpringAlongAxisSharedProperties = 2116810755,
+        DeformableOrientationConstraintSharedProperties = 244410052,
+        DeformableSliderConstraintSharedProperties = 1599977220,
+        PoweredConstraintSharedProperties = 684669764,
+        PoweredRagdollProperties = 403898115,
+        MaterialLoader = 1808933341,
+        ColliderTypeNames = 2016464643,
+        IntersectionPropertiesLoader = 2366705205,
+        PoseFixupProperties = 1106286942,
+        MassProperties = 4115583528,
+        PhysicsObjectFactory = 1472880679,
+        SmartNodeArray = 2450159653,
+
+        WebDrawablePoolLoader = 3363017779,
+        WebSegmentDataLoader = 382870263,
+        WebAnchorConeConfig = 1821657391,
+        WebConnectionConfigParams = 942661499,
+        WebReceiverBundleKnotProperties = 996172244,
+        WebReceiverConnectionProperties = 802529523,
+        WebReceiverProperties = 3804428962,
+
+        ArtilleryStrikeSpawnProfile = 2568114286,
+        BulletTracerProfile = 698765973,
+        GunAmmoProfile = 3214763909,
+        MissileSpawnProfile = 335637534,
+        MissileProfile = 1795643182,
+        WeaponUserProfile = 3767204762,
+
+        TransformationDescription = 1705969966,
+        ActionPromptConfig = 3547757846,
+        AIGroupCreationTemplate = 2785623559,
+        CharacterBudgetPolicyList = 2439320315,
+        TargetSelectionWeights = 760925779,
+        AutoTargetPriorityList = 1165531545,
+        AlertManagerProperties = 1552722049,
+        UnlockablesList = 1794577786,
+        DifficultySettings = 3851094813,
+        PlacementAssetCategory = 2082739923,
+        PlacementPackage = 2980034307,
+        StreamPackage = 804020905,
+        SubtitleManager = 1158764426,
+        GameObject = 3240679725,
+        GameObjectTemplateBuilder = 3246008931,
+        PropTemplate = 3387795030,
+
+        Address = 3841554896,
+        AddressPrefabRoot = 1691364145,
+        AddressTypes = 3487076079,
+
+        HitTypeDescription = 4058898212,
+
+        LightTextureSet = 935940809,
+        GlobalTextureSet = 389237785,
+        ConsumeTextureSet = 50933654,
+
+        AmbientFormationTemplate = 386822268,
+        DeformShaderProperties = 1504797505,
+        EffectPropParamsList = 1090289653,
+        DeformAudioProperties = 1410266080,
+        CharacterIntentionInputMap = 2003674137,
+        ConsumeUniquePrimitiveSet = 1749753374,
+        ConsumableProperties = 192926066,
+        DLCPackageInfoList = 2944030467,
     }
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class MetaObjectDefinitionNode : P3DNode
@@ -1927,7 +2191,7 @@ namespace RadicalCore.Gamefiles
         public string TypeName { get; set; }
         public ushort Unknown4 { get; set; }
         public ushort Unknown5 { get; set; }
-        public uint Unknown6 { get; set; }
+        public MetaType MetaType { get; set; }
 
         public override void Read(DataReader dr)
         {
@@ -1938,15 +2202,14 @@ namespace RadicalCore.Gamefiles
             TypeName = dr.ReadByteSizedString();
             Unknown4 = dr.ReadUInt16();
             Unknown5 = dr.ReadUInt16();
-            Unknown6 = dr.ReadUInt32();
+            MetaType = (MetaType)dr.ReadUInt32();
         }
 
         public override string ToString()
         {
-            return string.Format("{0} - {1}", Type, ShortName);
+            return string.Format("{0} - {1} {2}", Type, MetaType, ShortName);
         }
     }
-    
 
 
 

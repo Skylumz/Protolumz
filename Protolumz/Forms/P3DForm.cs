@@ -14,9 +14,13 @@ namespace Protolumz
 {
     public partial class P3DForm : Form
     {
-        private string FilePath { get; set; }
+        private string FilePath = null;
         private string FileName { get { return Path.GetFileName(FilePath); } }
-        private P3DFile ActiveFile { get; set; }
+        private P3DFile ActiveFile = null;
+
+        private TreeNode RootNode = null;
+
+        private TreeNode SelectedNode = null;
 
         public P3DForm(ExplorerForm ef, string fp, byte[] data)
         {
@@ -37,26 +41,48 @@ namespace Protolumz
             Text = "P3D Viewer - Skylumz - " + FileName;
         }
 
-        private void BuildTree()
+        private void UpdateUI()
         {
-            if (ActiveFile == null) return;
+            if (SelectedNode == null) return;
 
-            MainPropertyGrid.SelectedObject = ActiveFile;
-
-            MainTreeView.BeginUpdate();
-            MainTreeView.Nodes.Clear();
-
-            var root = new TreeNode(ActiveFile.Name);
-            root.Tag = ActiveFile;
-
-            foreach (var node in ActiveFile.Nodes)
+            var tag = SelectedNode.Tag;
+            if (tag is P3DNode)
             {
-                this.UpdateNode(node, root.Nodes);
+                MainPropertyGrid.SelectedObject = (P3DNode)SelectedNode.Tag;
             }
+            else if (tag is P3DFile)
+            {
+                MainPropertyGrid.SelectedObject = (P3DFile)SelectedNode.Tag;
+            }
+        }
 
-            MainTreeView.Nodes.Add(root);
-            root.Expand();
-            MainTreeView.EndUpdate();
+
+
+        private List<TreeNode> GetAllNodes(TreeNode parent = null)
+        {
+            var nodes = new List<TreeNode>();
+            nodes.Add(parent);
+            foreach (TreeNode node in parent.Nodes)
+            {
+                nodes.AddRange(GetAllNodes(node));
+            }
+            return nodes;
+        }
+        private List<TreeNode> GetAllNodesChecked()
+        {
+            var nodes = new List<TreeNode>();
+            foreach (TreeNode node in MainTreeView.Nodes)
+            {
+                var cnodes = GetAllNodes(node);
+                foreach(var cnode in cnodes)
+                {
+                    if (cnode.Checked)
+                    {
+                        nodes.Add(cnode);
+                    }
+                }
+            }
+            return nodes;
         }
 
         private void UpdateNode(P3DNode node, TreeNodeCollection parent)
@@ -71,59 +97,97 @@ namespace Protolumz
 
             parent.Add(tnode);
         }
-
-        private void MainTreeView_AfterSelect(object sender, TreeViewEventArgs e)
+        private void BuildTree()
         {
-            if (e.Node == null) return;
-            if (e.Node.Tag == null) return;
+            if (ActiveFile == null) return;
 
-            var tag = e.Node.Tag;
-            if (tag is P3DNode)
+            MainPropertyGrid.SelectedObject = ActiveFile;
+
+            MainTreeView.BeginUpdate();
+            MainTreeView.Nodes.Clear();
+
+            var root = new TreeNode(ActiveFile.Name);
+            root.Tag = ActiveFile;
+
+            RootNode = root;
+
+            foreach (var node in ActiveFile.Nodes)
             {
-                MainPropertyGrid.SelectedObject = (P3DNode)e.Node.Tag;
+                UpdateNode(node, root.Nodes);
             }
-            else if (tag is P3DFile)
+
+            MainTreeView.Nodes.Add(root);
+            root.Expand();
+            MainTreeView.EndUpdate();
+        }
+
+        private void Search(string term)
+        {
+            var nodes = GetAllNodes(RootNode);
+            var foundnodes = new List<TreeNode>();
+
+            MainTreeView.Nodes.Clear();
+
+            if (string.IsNullOrEmpty(term))
             {
-                MainPropertyGrid.SelectedObject = (P3DFile)e.Node.Tag;
+                MainTreeView.Nodes.Add(RootNode);
+                return;
+            }
+
+            foreach (var node in nodes)
+            {
+                if (node.Text.ToLower().Contains(term.ToLower()))
+                {
+                    foundnodes.Add(node.Clone() as TreeNode);
+                }
+            }
+
+            foreach (var node in foundnodes)
+            {
+                MainTreeView.Nodes.Add(node);
             }
         }
 
-        private void openHexToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OpenHexForm()
         {
-            var node = MainTreeView.SelectedNode;
+            if(SelectedNode == null) return;
 
-            if(node == null || node.Tag == null) return;
-            if(node.Tag is P3DNode)
+            if (SelectedNode.Tag is P3DNode)
             {
-                var pn = (P3DNode)node.Tag;
-                HexEditorForm form = new HexEditorForm(this, node.Text, pn.Data);
+                var pn = (P3DNode)SelectedNode.Tag;
+                HexEditorForm form = new HexEditorForm(this, SelectedNode.Text, pn.Data);
                 form.Show();
             }
         }
 
-        private List<TreeNode> GetAllNodes(TreeNode parent=null)
+        private void ExtractNodeData()
         {
-            var nodes = new List<TreeNode>();
-            nodes.Add(parent);
-            foreach(TreeNode node in parent.Nodes)
+            var tag = SelectedNode.Tag;
+            if (tag is P3DNode)
             {
-                nodes.AddRange(GetAllNodes(node));
+                using (var sfd = new SaveFileDialog())
+                {
+                    var pnode = tag as P3DNode;
+                    sfd.FileName = pnode.ToString();
+                    if (sfd.ShowDialog() == DialogResult.OK)
+                    {
+                        File.WriteAllBytes(sfd.FileName + ".data", pnode.Data);
+                    }
+                }
             }
-            return nodes;
         }
-
-        private void extractCheckedToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExtractNodesChecked()
         {
-            var nodes = GetAllNodes(MainTreeView.Nodes[0]);
-            using(var fbd = new FolderBrowserDialog())
+            var nodes = GetAllNodesChecked();
+            using (var fbd = new FolderBrowserDialog())
             {
-                if(fbd.ShowDialog() == DialogResult.OK)
+                if (fbd.ShowDialog() == DialogResult.OK)
                 {
                     var pnodes = new List<P3DNode>();
 
                     foreach (TreeNode node in nodes)
                     {
-                        if (node.Checked && node.Tag is P3DNode)
+                        if (node.Tag is P3DNode)
                         {
                             pnodes.Add((node.Tag as P3DNode));
                         }
@@ -138,49 +202,69 @@ namespace Protolumz
                     }
                 }
             }
+        }
+        private void ExtractNodesCheckedCombined()
+        {
+            using (var sfd = new SaveFileDialog())
+            {
+                sfd.FileName = FileName + ".data";
 
-            //using (var sfd = new SaveFileDialog())
-            //{
-            //    sfd.FileName = FileName + ".data";
-                
-            //    if (sfd.ShowDialog() == DialogResult.OK)
-            //    {
-            //        var nodes = GetAllNodes(MainTreeView.Nodes[0]);
-            //        var data = new List<byte>();
-                    
-            //        foreach(TreeNode node in nodes)
-            //        {
-            //            if (node.Checked && node.Tag is P3DNode)
-            //            {
-            //                data.AddRange((node.Tag as P3DNode).Data);
-            //            }
-            //        }
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    var nodes = GetAllNodesChecked();
+                    var data = new List<byte>();
 
-            //        var path = sfd.FileName;
-            //        File.WriteAllBytes(path, data.ToArray());
-            //    }
-            //}
+                    foreach (TreeNode node in nodes)
+                    {
+                        if (node.Tag is P3DNode)
+                        {
+                            data.AddRange((node.Tag as P3DNode).Data);
+                        }
+                    }
+
+                    var path = sfd.FileName;
+                    File.WriteAllBytes(path, data.ToArray());
+                }
+            }
+        }
+
+        private void ExtractOBJ()
+        {
+            if (!(SelectedNode.Tag is ModelNode)) return;
+
+            var modelnode = SelectedNode.Tag as ModelNode;
+        }
+
+
+        private void MainTreeView_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            SelectedNode = e.Node;
+            UpdateUI();
+        }
+
+        private void openHexToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenHexForm();
+        }
+        
+        private void extractCheckedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ExtractNodesChecked();
         }
 
         private void extractDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var node = MainTreeView.SelectedNode;
-            if (node == null) return;
-            if (node.Tag == null) return;
+            ExtractNodeData();
+        }
 
-            var tag = node.Tag;
-            if (tag is P3DNode)
-            {
-                using (var sfd = new SaveFileDialog())
-                {
-                    var pnode = tag as P3DNode;
-                    sfd.FileName = pnode.ToString() + ".data";
-                    if (sfd.ShowDialog() == DialogResult.OK)
-                    {
-                        File.WriteAllBytes(sfd.FileName, pnode.Data);
-                    }
-                }
-            }
+        private void SearchTextBox_TextChanged(object sender, EventArgs e)
+        {
+            Search(SearchTextBox.Text);
+        }
+
+        private void extractOBJToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ExtractOBJ();
         }
     }
 }

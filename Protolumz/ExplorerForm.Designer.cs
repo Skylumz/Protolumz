@@ -236,6 +236,7 @@
             this.SearchTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.SearchTextBox.Name = "SearchTextBox";
             this.SearchTextBox.Size = new System.Drawing.Size(150, 25);
+            this.SearchTextBox.TextChanged += new System.EventHandler(this.SearchTextBox_TextChanged);
             // 
             // SearchButton
             // 

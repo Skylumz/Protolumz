@@ -29,15 +29,37 @@
         private void InitializeComponent()
         {
             this.MainStatusStrip = new System.Windows.Forms.StatusStrip();
-            this.AmountOfBytesSelectedStatusStripLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.LengthStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.OffsetStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainToolStrip = new System.Windows.Forms.ToolStrip();
+            this.NumberTypeComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.BytePerLineComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.HexTextBox = new System.Windows.Forms.RichTextBox();
+            this.TextBoxesPanel = new System.Windows.Forms.Panel();
+            this.LabelsPanel = new System.Windows.Forms.Panel();
+            this.MainTabControl = new System.Windows.Forms.TabControl();
+            this.DetailsTabPage = new System.Windows.Forms.TabPage();
             this.SelectionPropertyGrid = new System.Windows.Forms.PropertyGrid();
-            this.saveDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolsTabPage = new System.Windows.Forms.TabPage();
+            this.SearchToolPanel = new System.Windows.Forms.Panel();
+            this.SearchResultsPanel = new System.Windows.Forms.Panel();
+            this.SearchResultsLabel = new System.Windows.Forms.Label();
+            this.SearchToolsPanel = new System.Windows.Forms.Panel();
+            this.SearchModeComboBox = new System.Windows.Forms.ComboBox();
+            this.SearchButton = new System.Windows.Forms.Button();
+            this.SearchLabel = new System.Windows.Forms.Label();
+            this.SearchTextBox = new System.Windows.Forms.TextBox();
+            this.DecodedTextBox = new SyncTextBox();
+            this.HexTextBox = new SyncTextBox();
+            this.OffsetTextBox = new SyncTextBox();
+            this.DecodedTextLabel = new SyncTextBox();
+            this.OffsetsLabel = new SyncTextBox();
+            this.OffsetLabel = new SyncTextBox();
             this.MainStatusStrip.SuspendLayout();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
@@ -45,23 +67,38 @@
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
+            this.TextBoxesPanel.SuspendLayout();
+            this.LabelsPanel.SuspendLayout();
+            this.MainTabControl.SuspendLayout();
+            this.DetailsTabPage.SuspendLayout();
+            this.ToolsTabPage.SuspendLayout();
+            this.SearchToolPanel.SuspendLayout();
+            this.SearchResultsPanel.SuspendLayout();
+            this.SearchToolsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainStatusStrip
             // 
             this.MainStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.AmountOfBytesSelectedStatusStripLabel});
+            this.LengthStatusLabel,
+            this.OffsetStatusLabel});
             this.MainStatusStrip.Location = new System.Drawing.Point(0, 428);
             this.MainStatusStrip.Name = "MainStatusStrip";
-            this.MainStatusStrip.Size = new System.Drawing.Size(800, 22);
+            this.MainStatusStrip.Size = new System.Drawing.Size(764, 22);
             this.MainStatusStrip.TabIndex = 0;
             this.MainStatusStrip.Text = "MainStatusStrip";
             // 
-            // AmountOfBytesSelectedStatusStripLabel
+            // LengthStatusLabel
             // 
-            this.AmountOfBytesSelectedStatusStripLabel.Name = "AmountOfBytesSelectedStatusStripLabel";
-            this.AmountOfBytesSelectedStatusStripLabel.Size = new System.Drawing.Size(136, 17);
-            this.AmountOfBytesSelectedStatusStripLabel.Text = "AmountOfBytesSelected";
+            this.LengthStatusLabel.Name = "LengthStatusLabel";
+            this.LengthStatusLabel.Size = new System.Drawing.Size(44, 17);
+            this.LengthStatusLabel.Text = "Length";
+            // 
+            // OffsetStatusLabel
+            // 
+            this.OffsetStatusLabel.Name = "OffsetStatusLabel";
+            this.OffsetStatusLabel.Size = new System.Drawing.Size(39, 17);
+            this.OffsetStatusLabel.Text = "Offset";
             // 
             // MainMenuStrip
             // 
@@ -69,27 +106,60 @@
             this.fileToolStripMenuItem});
             this.MainMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.MainMenuStrip.Name = "MainMenuStrip";
-            this.MainMenuStrip.Size = new System.Drawing.Size(800, 24);
+            this.MainMenuStrip.Size = new System.Drawing.Size(764, 24);
             this.MainMenuStrip.TabIndex = 3;
             this.MainMenuStrip.Text = "menuStrip2";
             // 
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveDataToolStripMenuItem});
+            this.openFileToolStripMenuItem,
+            this.saveToolStripMenuItem,
+            this.saveAsToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
+            // openFileToolStripMenuItem
+            // 
+            this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.openFileToolStripMenuItem.Text = "Open File";
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.saveToolStripMenuItem.Text = "Save";
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Text = "Save As";
+            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+            // 
             // MainToolStrip
             // 
             this.MainToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.NumberTypeComboBox,
             this.BytePerLineComboBox});
             this.MainToolStrip.Location = new System.Drawing.Point(0, 24);
             this.MainToolStrip.Name = "MainToolStrip";
-            this.MainToolStrip.Size = new System.Drawing.Size(800, 25);
+            this.MainToolStrip.Size = new System.Drawing.Size(764, 25);
             this.MainToolStrip.TabIndex = 4;
             this.MainToolStrip.Text = "toolStrip1";
+            // 
+            // NumberTypeComboBox
+            // 
+            this.NumberTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.NumberTypeComboBox.Items.AddRange(new object[] {
+            "Decimal",
+            "Hex",
+            "Octal"});
+            this.NumberTypeComboBox.Name = "NumberTypeComboBox";
+            this.NumberTypeComboBox.Size = new System.Drawing.Size(75, 25);
+            this.NumberTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.NumberTypeComboBox_SelectedIndexChanged);
             // 
             // BytePerLineComboBox
             // 
@@ -98,8 +168,11 @@
             "32",
             "64"});
             this.BytePerLineComboBox.Name = "BytePerLineComboBox";
-            this.BytePerLineComboBox.Size = new System.Drawing.Size(121, 25);
+            this.BytePerLineComboBox.Size = new System.Drawing.Size(75, 25);
+            this.BytePerLineComboBox.Text = "16";
             this.BytePerLineComboBox.SelectedIndexChanged += new System.EventHandler(this.BytePerLineComboBox_SelectedIndexChanged);
+            this.BytePerLineComboBox.TextUpdate += new System.EventHandler(this.BytePerLineComboBox_TextUpdate);
+            this.BytePerLineComboBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.BytePerLineComboBox_MouseUp);
             // 
             // MainSplitContainer
             // 
@@ -109,46 +182,265 @@
             // 
             // MainSplitContainer.Panel1
             // 
-            this.MainSplitContainer.Panel1.Controls.Add(this.HexTextBox);
+            this.MainSplitContainer.Panel1.Controls.Add(this.TextBoxesPanel);
+            this.MainSplitContainer.Panel1.Controls.Add(this.LabelsPanel);
             // 
             // MainSplitContainer.Panel2
             // 
-            this.MainSplitContainer.Panel2.Controls.Add(this.SelectionPropertyGrid);
-            this.MainSplitContainer.Size = new System.Drawing.Size(800, 379);
-            this.MainSplitContainer.SplitterDistance = 555;
+            this.MainSplitContainer.Panel2.Controls.Add(this.MainTabControl);
+            this.MainSplitContainer.Size = new System.Drawing.Size(764, 379);
+            this.MainSplitContainer.SplitterDistance = 455;
             this.MainSplitContainer.TabIndex = 5;
             // 
-            // HexTextBox
+            // TextBoxesPanel
             // 
-            this.HexTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.HexTextBox.Location = new System.Drawing.Point(0, 0);
-            this.HexTextBox.Name = "HexTextBox";
-            this.HexTextBox.Size = new System.Drawing.Size(555, 379);
-            this.HexTextBox.TabIndex = 0;
-            this.HexTextBox.Text = "";
-            this.HexTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HexTextBox_MouseUp);
+            this.TextBoxesPanel.Controls.Add(this.DecodedTextBox);
+            this.TextBoxesPanel.Controls.Add(this.HexTextBox);
+            this.TextBoxesPanel.Controls.Add(this.OffsetTextBox);
+            this.TextBoxesPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TextBoxesPanel.Location = new System.Drawing.Point(0, 18);
+            this.TextBoxesPanel.Name = "TextBoxesPanel";
+            this.TextBoxesPanel.Size = new System.Drawing.Size(455, 361);
+            this.TextBoxesPanel.TabIndex = 3;
+            // 
+            // LabelsPanel
+            // 
+            this.LabelsPanel.Controls.Add(this.DecodedTextLabel);
+            this.LabelsPanel.Controls.Add(this.OffsetsLabel);
+            this.LabelsPanel.Controls.Add(this.OffsetLabel);
+            this.LabelsPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.LabelsPanel.Location = new System.Drawing.Point(0, 0);
+            this.LabelsPanel.Name = "LabelsPanel";
+            this.LabelsPanel.Size = new System.Drawing.Size(455, 18);
+            this.LabelsPanel.TabIndex = 0;
+            // 
+            // MainTabControl
+            // 
+            this.MainTabControl.Controls.Add(this.DetailsTabPage);
+            this.MainTabControl.Controls.Add(this.ToolsTabPage);
+            this.MainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MainTabControl.Location = new System.Drawing.Point(0, 0);
+            this.MainTabControl.Name = "MainTabControl";
+            this.MainTabControl.SelectedIndex = 0;
+            this.MainTabControl.Size = new System.Drawing.Size(305, 379);
+            this.MainTabControl.TabIndex = 1;
+            // 
+            // DetailsTabPage
+            // 
+            this.DetailsTabPage.Controls.Add(this.SelectionPropertyGrid);
+            this.DetailsTabPage.Location = new System.Drawing.Point(4, 22);
+            this.DetailsTabPage.Name = "DetailsTabPage";
+            this.DetailsTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.DetailsTabPage.Size = new System.Drawing.Size(297, 353);
+            this.DetailsTabPage.TabIndex = 0;
+            this.DetailsTabPage.Text = "Details";
+            this.DetailsTabPage.UseVisualStyleBackColor = true;
             // 
             // SelectionPropertyGrid
             // 
             this.SelectionPropertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SelectionPropertyGrid.Location = new System.Drawing.Point(0, 0);
+            this.SelectionPropertyGrid.HelpVisible = false;
+            this.SelectionPropertyGrid.Location = new System.Drawing.Point(3, 3);
             this.SelectionPropertyGrid.Name = "SelectionPropertyGrid";
             this.SelectionPropertyGrid.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.SelectionPropertyGrid.Size = new System.Drawing.Size(241, 379);
+            this.SelectionPropertyGrid.Size = new System.Drawing.Size(291, 347);
             this.SelectionPropertyGrid.TabIndex = 0;
+            this.SelectionPropertyGrid.ToolbarVisible = false;
             // 
-            // saveDataToolStripMenuItem
+            // ToolsTabPage
             // 
-            this.saveDataToolStripMenuItem.Name = "saveDataToolStripMenuItem";
-            this.saveDataToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.saveDataToolStripMenuItem.Text = "Save Data";
-            this.saveDataToolStripMenuItem.Click += new System.EventHandler(this.saveDataToolStripMenuItem_Click);
+            this.ToolsTabPage.Controls.Add(this.SearchToolPanel);
+            this.ToolsTabPage.Location = new System.Drawing.Point(4, 22);
+            this.ToolsTabPage.Name = "ToolsTabPage";
+            this.ToolsTabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.ToolsTabPage.Size = new System.Drawing.Size(297, 353);
+            this.ToolsTabPage.TabIndex = 1;
+            this.ToolsTabPage.Text = "Tools";
+            this.ToolsTabPage.UseVisualStyleBackColor = true;
+            // 
+            // SearchToolPanel
+            // 
+            this.SearchToolPanel.Controls.Add(this.SearchResultsPanel);
+            this.SearchToolPanel.Controls.Add(this.SearchToolsPanel);
+            this.SearchToolPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.SearchToolPanel.Location = new System.Drawing.Point(3, 3);
+            this.SearchToolPanel.Name = "SearchToolPanel";
+            this.SearchToolPanel.Size = new System.Drawing.Size(291, 95);
+            this.SearchToolPanel.TabIndex = 4;
+            // 
+            // SearchResultsPanel
+            // 
+            this.SearchResultsPanel.Controls.Add(this.SearchResultsLabel);
+            this.SearchResultsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SearchResultsPanel.Location = new System.Drawing.Point(0, 76);
+            this.SearchResultsPanel.Name = "SearchResultsPanel";
+            this.SearchResultsPanel.Size = new System.Drawing.Size(291, 19);
+            this.SearchResultsPanel.TabIndex = 7;
+            // 
+            // SearchResultsLabel
+            // 
+            this.SearchResultsLabel.AutoSize = true;
+            this.SearchResultsLabel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.SearchResultsLabel.Location = new System.Drawing.Point(0, 0);
+            this.SearchResultsLabel.Name = "SearchResultsLabel";
+            this.SearchResultsLabel.Size = new System.Drawing.Size(84, 13);
+            this.SearchResultsLabel.TabIndex = 4;
+            this.SearchResultsLabel.Text = "Results: 0 found";
+            // 
+            // SearchToolsPanel
+            // 
+            this.SearchToolsPanel.Controls.Add(this.SearchModeComboBox);
+            this.SearchToolsPanel.Controls.Add(this.SearchButton);
+            this.SearchToolsPanel.Controls.Add(this.SearchLabel);
+            this.SearchToolsPanel.Controls.Add(this.SearchTextBox);
+            this.SearchToolsPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.SearchToolsPanel.Location = new System.Drawing.Point(0, 0);
+            this.SearchToolsPanel.Name = "SearchToolsPanel";
+            this.SearchToolsPanel.Size = new System.Drawing.Size(291, 76);
+            this.SearchToolsPanel.TabIndex = 6;
+            // 
+            // SearchModeComboBox
+            // 
+            this.SearchModeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SearchModeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.SearchModeComboBox.FormattingEnabled = true;
+            this.SearchModeComboBox.Items.AddRange(new object[] {
+            "byte",
+            "int16",
+            "uint16",
+            "int32",
+            "uint32",
+            "int64",
+            "uint64",
+            "float"});
+            this.SearchModeComboBox.Location = new System.Drawing.Point(7, 20);
+            this.SearchModeComboBox.Name = "SearchModeComboBox";
+            this.SearchModeComboBox.Size = new System.Drawing.Size(279, 21);
+            this.SearchModeComboBox.TabIndex = 1;
+            // 
+            // SearchButton
+            // 
+            this.SearchButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SearchButton.Location = new System.Drawing.Point(211, 47);
+            this.SearchButton.Name = "SearchButton";
+            this.SearchButton.Size = new System.Drawing.Size(75, 23);
+            this.SearchButton.TabIndex = 3;
+            this.SearchButton.Text = "Search";
+            this.SearchButton.UseVisualStyleBackColor = true;
+            this.SearchButton.Click += new System.EventHandler(this.SearchButton_Click);
+            // 
+            // SearchLabel
+            // 
+            this.SearchLabel.AutoSize = true;
+            this.SearchLabel.Location = new System.Drawing.Point(4, 4);
+            this.SearchLabel.Name = "SearchLabel";
+            this.SearchLabel.Size = new System.Drawing.Size(41, 13);
+            this.SearchLabel.TabIndex = 0;
+            this.SearchLabel.Text = "Search";
+            // 
+            // SearchTextBox
+            // 
+            this.SearchTextBox.Location = new System.Drawing.Point(7, 49);
+            this.SearchTextBox.Name = "SearchTextBox";
+            this.SearchTextBox.Size = new System.Drawing.Size(198, 20);
+            this.SearchTextBox.TabIndex = 2;
+            // 
+            // DecodedTextBox
+            // 
+            this.DecodedTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.DecodedTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.DecodedTextBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DecodedTextBox.HideSelection = false;
+            this.DecodedTextBox.LinkedTextBoxes = null;
+            this.DecodedTextBox.Location = new System.Drawing.Point(200, 0);
+            this.DecodedTextBox.Multiline = true;
+            this.DecodedTextBox.Name = "DecodedTextBox";
+            this.DecodedTextBox.ReadOnly = true;
+            this.DecodedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.DecodedTextBox.Size = new System.Drawing.Size(100, 361);
+            this.DecodedTextBox.TabIndex = 2;
+            this.DecodedTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DecodedTextBox_MouseUp);
+            // 
+            // HexTextBox
+            // 
+            this.HexTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.HexTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.HexTextBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.HexTextBox.HideSelection = false;
+            this.HexTextBox.LinkedTextBoxes = null;
+            this.HexTextBox.Location = new System.Drawing.Point(100, 0);
+            this.HexTextBox.Multiline = true;
+            this.HexTextBox.Name = "HexTextBox";
+            this.HexTextBox.ReadOnly = true;
+            this.HexTextBox.Size = new System.Drawing.Size(100, 361);
+            this.HexTextBox.TabIndex = 1;
+            this.HexTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HexTextBox_KeyUp);
+            this.HexTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HexTextBox_MouseUp);
+            // 
+            // OffsetTextBox
+            // 
+            this.OffsetTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.OffsetTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.OffsetTextBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.OffsetTextBox.Enabled = false;
+            this.OffsetTextBox.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.OffsetTextBox.LinkedTextBoxes = new System.Windows.Forms.Control[0];
+            this.OffsetTextBox.Location = new System.Drawing.Point(0, 0);
+            this.OffsetTextBox.Multiline = true;
+            this.OffsetTextBox.Name = "OffsetTextBox";
+            this.OffsetTextBox.Size = new System.Drawing.Size(100, 361);
+            this.OffsetTextBox.TabIndex = 0;
+            // 
+            // DecodedTextLabel
+            // 
+            this.DecodedTextLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.DecodedTextLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.DecodedTextLabel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DecodedTextLabel.Enabled = false;
+            this.DecodedTextLabel.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.DecodedTextLabel.LinkedTextBoxes = null;
+            this.DecodedTextLabel.Location = new System.Drawing.Point(200, 0);
+            this.DecodedTextLabel.Multiline = true;
+            this.DecodedTextLabel.Name = "DecodedTextLabel";
+            this.DecodedTextLabel.Size = new System.Drawing.Size(100, 18);
+            this.DecodedTextLabel.TabIndex = 2;
+            this.DecodedTextLabel.Text = "Decoded Text";
+            // 
+            // OffsetsLabel
+            // 
+            this.OffsetsLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.OffsetsLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.OffsetsLabel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.OffsetsLabel.Enabled = false;
+            this.OffsetsLabel.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.OffsetsLabel.LinkedTextBoxes = null;
+            this.OffsetsLabel.Location = new System.Drawing.Point(100, 0);
+            this.OffsetsLabel.Multiline = true;
+            this.OffsetsLabel.Name = "OffsetsLabel";
+            this.OffsetsLabel.Size = new System.Drawing.Size(100, 18);
+            this.OffsetsLabel.TabIndex = 1;
+            // 
+            // OffsetLabel
+            // 
+            this.OffsetLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.OffsetLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.OffsetLabel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.OffsetLabel.Enabled = false;
+            this.OffsetLabel.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.OffsetLabel.LinkedTextBoxes = null;
+            this.OffsetLabel.Location = new System.Drawing.Point(0, 0);
+            this.OffsetLabel.Multiline = true;
+            this.OffsetLabel.Name = "OffsetLabel";
+            this.OffsetLabel.Size = new System.Drawing.Size(100, 18);
+            this.OffsetLabel.TabIndex = 0;
+            this.OffsetLabel.Text = "Offset";
             // 
             // HexEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(764, 450);
             this.Controls.Add(this.MainSplitContainer);
             this.Controls.Add(this.MainToolStrip);
             this.Controls.Add(this.MainStatusStrip);
@@ -165,6 +457,18 @@
             this.MainSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).EndInit();
             this.MainSplitContainer.ResumeLayout(false);
+            this.TextBoxesPanel.ResumeLayout(false);
+            this.TextBoxesPanel.PerformLayout();
+            this.LabelsPanel.ResumeLayout(false);
+            this.LabelsPanel.PerformLayout();
+            this.MainTabControl.ResumeLayout(false);
+            this.DetailsTabPage.ResumeLayout(false);
+            this.ToolsTabPage.ResumeLayout(false);
+            this.SearchToolPanel.ResumeLayout(false);
+            this.SearchResultsPanel.ResumeLayout(false);
+            this.SearchResultsPanel.PerformLayout();
+            this.SearchToolsPanel.ResumeLayout(false);
+            this.SearchToolsPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -173,14 +477,36 @@
         #endregion
 
         private System.Windows.Forms.StatusStrip MainStatusStrip;
-        private System.Windows.Forms.ToolStripStatusLabel AmountOfBytesSelectedStatusStripLabel;
+        private System.Windows.Forms.ToolStripStatusLabel LengthStatusLabel;
         private System.Windows.Forms.MenuStrip MainMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStrip MainToolStrip;
         private System.Windows.Forms.ToolStripComboBox BytePerLineComboBox;
         private System.Windows.Forms.SplitContainer MainSplitContainer;
-        private System.Windows.Forms.RichTextBox HexTextBox;
         private System.Windows.Forms.PropertyGrid SelectionPropertyGrid;
-        private System.Windows.Forms.ToolStripMenuItem saveDataToolStripMenuItem;
+        private System.Windows.Forms.Panel TextBoxesPanel;
+        private SyncTextBox DecodedTextBox;
+        private SyncTextBox HexTextBox;
+        private SyncTextBox OffsetTextBox;
+        private System.Windows.Forms.Panel LabelsPanel;
+        private System.Windows.Forms.ToolStripMenuItem openFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel OffsetStatusLabel;
+        private System.Windows.Forms.TabControl MainTabControl;
+        private System.Windows.Forms.TabPage DetailsTabPage;
+        private System.Windows.Forms.TabPage ToolsTabPage;
+        private System.Windows.Forms.Label SearchLabel;
+        private SyncTextBox DecodedTextLabel;
+        private SyncTextBox OffsetsLabel;
+        private SyncTextBox OffsetLabel;
+        private System.Windows.Forms.ToolStripComboBox NumberTypeComboBox;
+        private System.Windows.Forms.Button SearchButton;
+        private System.Windows.Forms.TextBox SearchTextBox;
+        private System.Windows.Forms.ComboBox SearchModeComboBox;
+        private System.Windows.Forms.Panel SearchToolPanel;
+        private System.Windows.Forms.Panel SearchResultsPanel;
+        private System.Windows.Forms.Panel SearchToolsPanel;
+        private System.Windows.Forms.Label SearchResultsLabel;
     }
 }

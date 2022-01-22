@@ -54,6 +54,7 @@
     <Compile Include="Gamefiles\P3DFile.cs" />
     <Compile Include="Gamefiles\RcfFile.cs" />
     <Compile Include="Gamefiles\RcfManager.cs" />
+    <Compile Include="Gamefiles\Resources\MetaTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\DataReader.cs" />
     <Compile Include="Resources\HashUtil.cs" />

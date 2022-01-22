@@ -70,6 +70,9 @@
     <Compile Include="Forms\TextEditorForm.designer.cs">
       <DependentUpon>TextEditorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Winforms\SyncTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\Winforms\ToolStripAutoSizeTextBox.cs">
       <SubType>Component</SubType>
     </Compile>

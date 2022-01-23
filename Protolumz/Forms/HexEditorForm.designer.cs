@@ -41,7 +41,13 @@
             this.BytePerLineComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.TextBoxesPanel = new System.Windows.Forms.Panel();
+            this.DecodedTextBox = new SyncTextBox();
+            this.HexTextBox = new SyncTextBox();
+            this.OffsetTextBox = new SyncTextBox();
             this.LabelsPanel = new System.Windows.Forms.Panel();
+            this.DecodedTextLabel = new SyncTextBox();
+            this.OffsetsLabel = new SyncTextBox();
+            this.OffsetLabel = new SyncTextBox();
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.DetailsTabPage = new System.Windows.Forms.TabPage();
             this.SelectionPropertyGrid = new System.Windows.Forms.PropertyGrid();
@@ -54,12 +60,8 @@
             this.SearchButton = new System.Windows.Forms.Button();
             this.SearchLabel = new System.Windows.Forms.Label();
             this.SearchTextBox = new System.Windows.Forms.TextBox();
-            this.DecodedTextBox = new SyncTextBox();
-            this.HexTextBox = new SyncTextBox();
-            this.OffsetTextBox = new SyncTextBox();
-            this.DecodedTextLabel = new SyncTextBox();
-            this.OffsetsLabel = new SyncTextBox();
-            this.OffsetLabel = new SyncTextBox();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.classParserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainStatusStrip.SuspendLayout();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
@@ -103,7 +105,8 @@
             // MainMenuStrip
             // 
             this.MainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.editToolStripMenuItem});
             this.MainMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.MainMenuStrip.Name = "MainMenuStrip";
             this.MainMenuStrip.Size = new System.Drawing.Size(764, 24);
@@ -123,13 +126,13 @@
             // openFileToolStripMenuItem
             // 
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openFileToolStripMenuItem.Text = "Open File";
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // saveAsToolStripMenuItem
@@ -203,6 +206,52 @@
             this.TextBoxesPanel.Size = new System.Drawing.Size(455, 361);
             this.TextBoxesPanel.TabIndex = 3;
             // 
+            // DecodedTextBox
+            // 
+            this.DecodedTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.DecodedTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.DecodedTextBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DecodedTextBox.HideSelection = false;
+            this.DecodedTextBox.LinkedTextBoxes = null;
+            this.DecodedTextBox.Location = new System.Drawing.Point(200, 0);
+            this.DecodedTextBox.Multiline = true;
+            this.DecodedTextBox.Name = "DecodedTextBox";
+            this.DecodedTextBox.ReadOnly = true;
+            this.DecodedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.DecodedTextBox.Size = new System.Drawing.Size(100, 361);
+            this.DecodedTextBox.TabIndex = 2;
+            this.DecodedTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DecodedTextBox_MouseUp);
+            // 
+            // HexTextBox
+            // 
+            this.HexTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.HexTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.HexTextBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.HexTextBox.HideSelection = false;
+            this.HexTextBox.LinkedTextBoxes = null;
+            this.HexTextBox.Location = new System.Drawing.Point(100, 0);
+            this.HexTextBox.Multiline = true;
+            this.HexTextBox.Name = "HexTextBox";
+            this.HexTextBox.ReadOnly = true;
+            this.HexTextBox.Size = new System.Drawing.Size(100, 361);
+            this.HexTextBox.TabIndex = 1;
+            this.HexTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HexTextBox_KeyUp);
+            this.HexTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HexTextBox_MouseUp);
+            // 
+            // OffsetTextBox
+            // 
+            this.OffsetTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.OffsetTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.OffsetTextBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.OffsetTextBox.Enabled = false;
+            this.OffsetTextBox.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.OffsetTextBox.LinkedTextBoxes = new System.Windows.Forms.Control[0];
+            this.OffsetTextBox.Location = new System.Drawing.Point(0, 0);
+            this.OffsetTextBox.Multiline = true;
+            this.OffsetTextBox.Name = "OffsetTextBox";
+            this.OffsetTextBox.Size = new System.Drawing.Size(100, 361);
+            this.OffsetTextBox.TabIndex = 0;
+            // 
             // LabelsPanel
             // 
             this.LabelsPanel.Controls.Add(this.DecodedTextLabel);
@@ -213,6 +262,50 @@
             this.LabelsPanel.Name = "LabelsPanel";
             this.LabelsPanel.Size = new System.Drawing.Size(455, 18);
             this.LabelsPanel.TabIndex = 0;
+            // 
+            // DecodedTextLabel
+            // 
+            this.DecodedTextLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.DecodedTextLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.DecodedTextLabel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DecodedTextLabel.Enabled = false;
+            this.DecodedTextLabel.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.DecodedTextLabel.LinkedTextBoxes = null;
+            this.DecodedTextLabel.Location = new System.Drawing.Point(200, 0);
+            this.DecodedTextLabel.Multiline = true;
+            this.DecodedTextLabel.Name = "DecodedTextLabel";
+            this.DecodedTextLabel.Size = new System.Drawing.Size(100, 18);
+            this.DecodedTextLabel.TabIndex = 2;
+            this.DecodedTextLabel.Text = "Decoded Text";
+            // 
+            // OffsetsLabel
+            // 
+            this.OffsetsLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.OffsetsLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.OffsetsLabel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.OffsetsLabel.Enabled = false;
+            this.OffsetsLabel.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.OffsetsLabel.LinkedTextBoxes = null;
+            this.OffsetsLabel.Location = new System.Drawing.Point(100, 0);
+            this.OffsetsLabel.Multiline = true;
+            this.OffsetsLabel.Name = "OffsetsLabel";
+            this.OffsetsLabel.Size = new System.Drawing.Size(100, 18);
+            this.OffsetsLabel.TabIndex = 1;
+            // 
+            // OffsetLabel
+            // 
+            this.OffsetLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.OffsetLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.OffsetLabel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.OffsetLabel.Enabled = false;
+            this.OffsetLabel.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.OffsetLabel.LinkedTextBoxes = null;
+            this.OffsetLabel.Location = new System.Drawing.Point(0, 0);
+            this.OffsetLabel.Multiline = true;
+            this.OffsetLabel.Name = "OffsetLabel";
+            this.OffsetLabel.Size = new System.Drawing.Size(100, 18);
+            this.OffsetLabel.TabIndex = 0;
+            this.OffsetLabel.Text = "Offset";
             // 
             // MainTabControl
             // 
@@ -346,95 +439,20 @@
             this.SearchTextBox.Size = new System.Drawing.Size(198, 20);
             this.SearchTextBox.TabIndex = 2;
             // 
-            // DecodedTextBox
+            // editToolStripMenuItem
             // 
-            this.DecodedTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.DecodedTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.DecodedTextBox.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DecodedTextBox.HideSelection = false;
-            this.DecodedTextBox.LinkedTextBoxes = null;
-            this.DecodedTextBox.Location = new System.Drawing.Point(200, 0);
-            this.DecodedTextBox.Multiline = true;
-            this.DecodedTextBox.Name = "DecodedTextBox";
-            this.DecodedTextBox.ReadOnly = true;
-            this.DecodedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.DecodedTextBox.Size = new System.Drawing.Size(100, 361);
-            this.DecodedTextBox.TabIndex = 2;
-            this.DecodedTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DecodedTextBox_MouseUp);
+            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.classParserToolStripMenuItem});
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.editToolStripMenuItem.Text = "Edit";
             // 
-            // HexTextBox
+            // classParserToolStripMenuItem
             // 
-            this.HexTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.HexTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.HexTextBox.Dock = System.Windows.Forms.DockStyle.Left;
-            this.HexTextBox.HideSelection = false;
-            this.HexTextBox.LinkedTextBoxes = null;
-            this.HexTextBox.Location = new System.Drawing.Point(100, 0);
-            this.HexTextBox.Multiline = true;
-            this.HexTextBox.Name = "HexTextBox";
-            this.HexTextBox.ReadOnly = true;
-            this.HexTextBox.Size = new System.Drawing.Size(100, 361);
-            this.HexTextBox.TabIndex = 1;
-            this.HexTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HexTextBox_KeyUp);
-            this.HexTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HexTextBox_MouseUp);
-            // 
-            // OffsetTextBox
-            // 
-            this.OffsetTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.OffsetTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.OffsetTextBox.Dock = System.Windows.Forms.DockStyle.Left;
-            this.OffsetTextBox.Enabled = false;
-            this.OffsetTextBox.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.OffsetTextBox.LinkedTextBoxes = new System.Windows.Forms.Control[0];
-            this.OffsetTextBox.Location = new System.Drawing.Point(0, 0);
-            this.OffsetTextBox.Multiline = true;
-            this.OffsetTextBox.Name = "OffsetTextBox";
-            this.OffsetTextBox.Size = new System.Drawing.Size(100, 361);
-            this.OffsetTextBox.TabIndex = 0;
-            // 
-            // DecodedTextLabel
-            // 
-            this.DecodedTextLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.DecodedTextLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.DecodedTextLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DecodedTextLabel.Enabled = false;
-            this.DecodedTextLabel.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.DecodedTextLabel.LinkedTextBoxes = null;
-            this.DecodedTextLabel.Location = new System.Drawing.Point(200, 0);
-            this.DecodedTextLabel.Multiline = true;
-            this.DecodedTextLabel.Name = "DecodedTextLabel";
-            this.DecodedTextLabel.Size = new System.Drawing.Size(100, 18);
-            this.DecodedTextLabel.TabIndex = 2;
-            this.DecodedTextLabel.Text = "Decoded Text";
-            // 
-            // OffsetsLabel
-            // 
-            this.OffsetsLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.OffsetsLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.OffsetsLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.OffsetsLabel.Enabled = false;
-            this.OffsetsLabel.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.OffsetsLabel.LinkedTextBoxes = null;
-            this.OffsetsLabel.Location = new System.Drawing.Point(100, 0);
-            this.OffsetsLabel.Multiline = true;
-            this.OffsetsLabel.Name = "OffsetsLabel";
-            this.OffsetsLabel.Size = new System.Drawing.Size(100, 18);
-            this.OffsetsLabel.TabIndex = 1;
-            // 
-            // OffsetLabel
-            // 
-            this.OffsetLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.OffsetLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.OffsetLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.OffsetLabel.Enabled = false;
-            this.OffsetLabel.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.OffsetLabel.LinkedTextBoxes = null;
-            this.OffsetLabel.Location = new System.Drawing.Point(0, 0);
-            this.OffsetLabel.Multiline = true;
-            this.OffsetLabel.Name = "OffsetLabel";
-            this.OffsetLabel.Size = new System.Drawing.Size(100, 18);
-            this.OffsetLabel.TabIndex = 0;
-            this.OffsetLabel.Text = "Offset";
+            this.classParserToolStripMenuItem.Name = "classParserToolStripMenuItem";
+            this.classParserToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.classParserToolStripMenuItem.Text = "Class Parser";
+            this.classParserToolStripMenuItem.Click += new System.EventHandler(this.classParserToolStripMenuItem_Click);
             // 
             // HexEditorForm
             // 
@@ -508,5 +526,7 @@
         private System.Windows.Forms.Panel SearchResultsPanel;
         private System.Windows.Forms.Panel SearchToolsPanel;
         private System.Windows.Forms.Label SearchResultsLabel;
+        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem classParserToolStripMenuItem;
     }
 }

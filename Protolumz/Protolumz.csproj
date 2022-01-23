@@ -52,6 +52,12 @@
     <Compile Include="ExplorerForm.Designer.cs">
       <DependentUpon>ExplorerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\HexClassCreatorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\HexClassCreatorForm.Designer.cs">
+      <DependentUpon>HexClassCreatorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\HexEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -70,6 +76,7 @@
     <Compile Include="Forms\TextEditorForm.designer.cs">
       <DependentUpon>TextEditorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Winforms\InputBox.cs" />
     <Compile Include="Forms\Winforms\SyncTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -80,6 +87,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ExplorerForm.resx">
       <DependentUpon>ExplorerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\HexClassCreatorForm.resx">
+      <DependentUpon>HexClassCreatorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\HexEditorForm.resx">
       <DependentUpon>HexEditorForm.cs</DependentUpon>

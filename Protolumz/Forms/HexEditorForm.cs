@@ -28,7 +28,7 @@ namespace Protolumz
                 return split[split.Length - 1];
             } 
         }
-        private byte[] Data { get; set; }
+        public byte[] Data { get; set; }
 
         private byte[] SelectedBytes { get; set; }
         private NumberType NumberType = NumberType.Decimal;
@@ -589,6 +589,12 @@ namespace Protolumz
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveAs();
+        }
+
+        private void classParserToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HexClassCreatorForm hcc = new HexClassCreatorForm(this);
+            hcc.Show(this);
         }
     }
 

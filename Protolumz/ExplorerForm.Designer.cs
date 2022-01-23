@@ -318,6 +318,7 @@
             this.MainListView.View = System.Windows.Forms.View.Details;
             this.MainListView.ItemActivate += new System.EventHandler(this.MainListView_ItemActivate);
             this.MainListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MainListView_MouseUp);
+            this.MainListView.FullRowSelect = true;
             // 
             // NameColumn
             // 

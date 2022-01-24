@@ -62,6 +62,8 @@ namespace RadicalCore.Gamefiles
 
         public void TestP3DS()
         {
+            StringBuilder sb = new StringBuilder();
+
             foreach(var file in AllRcfs)
             {
                 UpdateStatus("Scanning: " + file.Name + "...");
@@ -76,6 +78,15 @@ namespace RadicalCore.Gamefiles
                             UpdateStatus("Scanning: " + entry.Name + " in " + file.Name + "...");
                             var p3d = new P3DFile(entry.Name);
                             p3d.Load(file.GetData(entry));
+
+                            foreach(var node in p3d.GetAllNodes())
+                            {
+                                if (!Enum.IsDefined(typeof(P3DNodeType), node.Type))
+                                {
+                                    //sb.AppendLine(p3d.Name + " " + node.Type);
+                                    LogError(p3d.Name + " " + node.Type);
+                                }
+                            }
                         }
                         catch (Exception ex)
                         {

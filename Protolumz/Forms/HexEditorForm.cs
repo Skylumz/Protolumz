@@ -214,7 +214,9 @@ namespace Protolumz
                 selidx -= 1;
                 movedback = true;
             }
-            sel = HexTextBox.Text.Substring(HexTextBox.SelectionStart + HexTextBox.SelectionLength, 2);
+            var length = HexTextBox.SelectionStart + HexTextBox.SelectionLength;
+            if (length >= HexTextBox.Text.Length) return;
+            sel = HexTextBox.Text.Substring(length, 2);
             if (sel.EndsWith(" "))
             {
                 sellength += 1;

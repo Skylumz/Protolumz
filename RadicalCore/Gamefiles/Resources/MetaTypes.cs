@@ -1,4 +1,5 @@
 ﻿using RadicalCore.Resources;
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,10 @@ namespace RadicalCore.Gamefiles
 {
     public enum MetaType : uint
     {
+        TrackedMotionToExpressionMap = 2773198086,
+
+        ContentCementFileDefinition = 172001507,
+
         PropRestoreDataArray = 2173087383,
 
         AchievementsManager = 3352760320,
@@ -140,12 +145,11 @@ namespace RadicalCore.Gamefiles
             return string.Format("{0} - {1} {2}", Type, MetaType, ShortName);
         }
     }
-
     public class MetaObjectDataNode : P3DNode
     {
         public uint NodeDataLength { get; set; }
         public byte[] NodeData { get; set; }
-
+        public uint Idenitifer { get; set; } //META
 
         public override void Read(DataReader dr)
         {
@@ -153,11 +157,70 @@ namespace RadicalCore.Gamefiles
 
             NodeDataLength = dr.ReadUInt32();
             NodeData = dr.ReadBytes((int)NodeDataLength);
+            dr.Position -= NodeDataLength;
+            Idenitifer = dr.ReadUInt32();
+            dr.Position += NodeDataLength;
         }
 
         public override string ToString()
         {
             return string.Format("{0} - {1} bytes", Type, NodeDataLength);
+        }
+    }
+
+    public class Prop
+    {
+        public uint NameLength { get; set; }
+        public string Name { get; set; }
+        public Vector3 Position { get; set; }
+        public Vector4 Rotation { get; set; }
+        public Vector3 Scale { get; set; }
+        public uint UnkStr1Length { get; set; }
+        public string UnkStr1 { get; set; }
+        public uint Unknown1 { get; set; } // 0
+        public uint Unknown2 { get; set; } // 1 
+
+        public void Read(DataReader dr)
+        {
+            NameLength = dr.ReadUInt32();
+            Name = dr.ReadString((int)NameLength);
+            Position = dr.ReadVector3();
+            Rotation = dr.ReadVector4();
+            Scale = dr.ReadVector3();
+            UnkStr1Length = dr.ReadUInt32();
+            if(UnkStr1Length > 0)
+            {
+                UnkStr1 = dr.ReadString((int)UnkStr1Length);
+            }
+            Unknown1 = dr.ReadUInt32();
+            Unknown2 = dr.ReadUInt32();
+        }
+
+        public void Write(DataWriter dw)
+        {
+
+        }
+    }
+    public class PropRestoreArray
+    {
+        public uint PropCount { get; set; }
+        public List<Prop> Props { get; set; }
+
+        public void Read(DataReader dr)
+        {
+            PropCount = dr.ReadUInt32();
+            Props = new List<Prop>();
+            for (int i = 0; i < PropCount; i++)
+            {
+                var p = new Prop();
+                p.Read(dr);
+                Props.Add(p);
+            }
+        }
+
+        public void Write(DataWriter dw)
+        {
+
         }
     }
 }

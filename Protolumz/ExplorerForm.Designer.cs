@@ -271,6 +271,7 @@
             this.MainTreeView.ContextMenuStrip = this.MainTreeNodeContextMenu;
             this.MainTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainTreeView.FullRowSelect = true;
+            this.MainTreeView.HideSelection = false;
             this.MainTreeView.ImageIndex = 0;
             this.MainTreeView.ImageList = this.MainImageList;
             this.MainTreeView.Location = new System.Drawing.Point(0, 0);
@@ -308,6 +309,7 @@
             this.PathColumn});
             this.MainListView.ContextMenuStrip = this.MainListViewContextMenu;
             this.MainListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MainListView.FullRowSelect = true;
             this.MainListView.HideSelection = false;
             this.MainListView.Location = new System.Drawing.Point(0, 0);
             this.MainListView.Name = "MainListView";
@@ -318,7 +320,6 @@
             this.MainListView.View = System.Windows.Forms.View.Details;
             this.MainListView.ItemActivate += new System.EventHandler(this.MainListView_ItemActivate);
             this.MainListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MainListView_MouseUp);
-            this.MainListView.FullRowSelect = true;
             // 
             // NameColumn
             // 

@@ -188,7 +188,16 @@ namespace Protolumz
             }
         }
         private void LogError(string text) 
-        { }
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new Action(() => UpdateStatus(text)));
+            }
+            else
+            {
+                MessageBox.Show(text);
+            }
+        }
 
 
         public int GetImageIndex(string ext)

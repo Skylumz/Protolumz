@@ -15,8 +15,19 @@ namespace Protolumz
 {
     public partial class ExplorerForm : Form
     {
-        private string gameFolder = @"D:\Games\SteamLibrary\steamapps\common\Prototype 2\prototype2.exe";
         private const string exename = "prototype2.exe";
+        private string gameFolder
+        { 
+            get 
+            { 
+                return Properties.Settings.Default.GameFolder; 
+            }
+            set
+            {
+                Properties.Settings.Default.GameFolder = value;
+                Properties.Settings.Default.Save();
+            }
+        }
 
         private RcfManager RcfMan;
 
@@ -87,7 +98,7 @@ namespace Protolumz
                 bool cancel = false;
                 while ((!isOk & !cancel) == true)
                 {
-                    cancel = YesNoMessageBox("Please select a folder that contains "  + exename, "Select Folder");
+                    cancel = YesNoMessageBox("Would you like to select a folder that contains "  + exename, "Select Folder");
                     if (cancel) continue;
                     var fld = GetFolder();
                     if (string.IsNullOrEmpty(fld)) continue;
@@ -108,10 +119,10 @@ namespace Protolumz
         }
         private bool YesNoMessageBox(string caption, string title)
         {
-            var diag = MessageBox.Show(caption, title, MessageBoxButtons.OKCancel);
+            var diag = MessageBox.Show(caption, title, MessageBoxButtons.YesNo);
             switch (diag)
             {
-                case DialogResult.Cancel:
+                case DialogResult.No:
                     return true;
                 default:
                     return false;
@@ -467,7 +478,7 @@ namespace Protolumz
             {
                 //if (SelectedNode.Text == name) return SelectedNode;
 
-                var nodes = (parent == null) ? GetAllNodes(MainTreeView.Nodes[0]) : GetAllNodes(parent);
+                var nodes = (parent == null) ? TreeCollectionToList(MainTreeView.Nodes[0].Nodes) : TreeCollectionToList(parent.Nodes);
                 foreach (TreeNode node in nodes)
                 {
                     if (node.Text == name)
@@ -516,7 +527,15 @@ namespace Protolumz
             }
             return result;
         }
-
+        private List<TreeNode> TreeCollectionToList(TreeNodeCollection nodes)
+        {
+            List<TreeNode> result = new List<TreeNode>();
+            foreach(TreeNode node in nodes)
+            {
+                result.Add(node);
+            }
+            return result;
+        }
         
 
         private void Search(string term)
@@ -556,7 +575,7 @@ namespace Protolumz
                     }
                 }
             }
-            
+
 
             node.Tag = items;
             MainTreeView.Nodes.Add(node);
@@ -575,7 +594,7 @@ namespace Protolumz
                 SelectNode(text, null);
             }
 
-            var searchitems = GetListViewItems(SelectedNode);
+            var searchitems = GetListViewItems(SelectedNode)
             if (searchitems == null) return;
             var items = new List<ListViewItem>();
             foreach(ListViewItem item in searchitems)
@@ -832,6 +851,20 @@ namespace Protolumz
         private void GoForwardButton_Click(object sender, EventArgs e)
         {
             GoForward();
+        }
+        private void PathTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                SelectNode(PathTextBox.Text);
+            }
+        }
+        private void SearchTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                Search(SearchTextBox.Text);
+            }
         }
 
         //list view context menu

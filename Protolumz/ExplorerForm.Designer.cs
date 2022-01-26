@@ -143,7 +143,7 @@
             this.MainImageList.Images.SetKeyName(0, "temp");
             this.MainImageList.Images.SetKeyName(1, "default");
             this.MainImageList.Images.SetKeyName(2, "folder");
-            this.MainImageList.Images.SetKeyName(3, "archive");
+            this.MainImageList.Images.SetKeyName(3, "img423.png");
             this.MainImageList.Images.SetKeyName(4, "xml");
             this.MainImageList.Images.SetKeyName(5, "application");
             this.MainImageList.Images.SetKeyName(6, "web");
@@ -155,18 +155,19 @@
             this.MainImageList.Images.SetKeyName(12, "img624.png");
             this.MainImageList.Images.SetKeyName(13, "unk");
             this.MainImageList.Images.SetKeyName(14, "img622.png");
-            this.MainImageList.Images.SetKeyName(15, "img620.png");
-            this.MainImageList.Images.SetKeyName(16, "img646.png");
-            this.MainImageList.Images.SetKeyName(17, "img645.png");
-            this.MainImageList.Images.SetKeyName(18, "img643.png");
-            this.MainImageList.Images.SetKeyName(19, "img659.png");
-            this.MainImageList.Images.SetKeyName(20, "unk");
-            this.MainImageList.Images.SetKeyName(21, "p3d");
-            this.MainImageList.Images.SetKeyName(22, "img657.png");
-            this.MainImageList.Images.SetKeyName(23, "img656.png");
-            this.MainImageList.Images.SetKeyName(24, "img654.png");
-            this.MainImageList.Images.SetKeyName(25, "img653.png");
-            this.MainImageList.Images.SetKeyName(26, "img652.png");
+            this.MainImageList.Images.SetKeyName(15, "archive");
+            this.MainImageList.Images.SetKeyName(16, "img620.png");
+            this.MainImageList.Images.SetKeyName(17, "img646.png");
+            this.MainImageList.Images.SetKeyName(18, "img645.png");
+            this.MainImageList.Images.SetKeyName(19, "img643.png");
+            this.MainImageList.Images.SetKeyName(20, "img659.png");
+            this.MainImageList.Images.SetKeyName(21, "unk");
+            this.MainImageList.Images.SetKeyName(22, "p3d");
+            this.MainImageList.Images.SetKeyName(23, "img657.png");
+            this.MainImageList.Images.SetKeyName(24, "img656.png");
+            this.MainImageList.Images.SetKeyName(25, "img654.png");
+            this.MainImageList.Images.SetKeyName(26, "img653.png");
+            this.MainImageList.Images.SetKeyName(27, "img652.png");
             // 
             // MainToolStrip
             // 
@@ -210,6 +211,7 @@
             this.PathTextBox.Name = "PathTextBox";
             this.PathTextBox.Padding = new System.Windows.Forms.Padding(0, 0, 50, 0);
             this.PathTextBox.Size = new System.Drawing.Size(490, 25);
+            this.PathTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PathTextBox_KeyUp);
             // 
             // PathButton
             // 
@@ -236,6 +238,7 @@
             this.SearchTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.SearchTextBox.Name = "SearchTextBox";
             this.SearchTextBox.Size = new System.Drawing.Size(150, 25);
+            this.SearchTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.SearchTextBox_KeyUp);
             this.SearchTextBox.TextChanged += new System.EventHandler(this.SearchTextBox_TextChanged);
             // 
             // SearchButton

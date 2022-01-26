@@ -416,6 +416,18 @@ namespace RadicalCore.Gamefiles
             return node;
         }
 
+        public P3DNode GetTopMostParent()
+        {
+            if (Parent != null)
+            {
+                return Parent.GetTopMostParent();
+            }
+            else
+            {
+                return this;
+            }
+        }
+
         public override string ToString()
         {
             return string.Format("{0} - @{1} {2} bytes", Type, Offset, Size);

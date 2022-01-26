@@ -36,18 +36,12 @@
             this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.classParserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainToolStrip = new System.Windows.Forms.ToolStrip();
             this.NumberTypeComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.BytePerLineComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.TextBoxesPanel = new System.Windows.Forms.Panel();
-            this.DecodedTextBox = new SyncTextBox();
-            this.HexTextBox = new SyncTextBox();
-            this.OffsetTextBox = new SyncTextBox();
-            this.LabelsPanel = new System.Windows.Forms.Panel();
-            this.DecodedTextLabel = new SyncTextBox();
-            this.OffsetsLabel = new SyncTextBox();
-            this.OffsetLabel = new SyncTextBox();
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.DetailsTabPage = new System.Windows.Forms.TabPage();
             this.SelectionPropertyGrid = new System.Windows.Forms.PropertyGrid();
@@ -60,8 +54,7 @@
             this.SearchButton = new System.Windows.Forms.Button();
             this.SearchLabel = new System.Windows.Forms.Label();
             this.SearchTextBox = new System.Windows.Forms.TextBox();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.classParserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.HexViewer = new Protolumz.HexViewer();
             this.MainStatusStrip.SuspendLayout();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
@@ -69,8 +62,6 @@
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
-            this.TextBoxesPanel.SuspendLayout();
-            this.LabelsPanel.SuspendLayout();
             this.MainTabControl.SuspendLayout();
             this.DetailsTabPage.SuspendLayout();
             this.ToolsTabPage.SuspendLayout();
@@ -126,21 +117,36 @@
             // openFileToolStripMenuItem
             // 
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.openFileToolStripMenuItem.Text = "Open File";
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.saveAsToolStripMenuItem.Text = "Save As";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.classParserToolStripMenuItem});
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.editToolStripMenuItem.Text = "Edit";
+            // 
+            // classParserToolStripMenuItem
+            // 
+            this.classParserToolStripMenuItem.Name = "classParserToolStripMenuItem";
+            this.classParserToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.classParserToolStripMenuItem.Text = "Class Parser";
+            this.classParserToolStripMenuItem.Click += new System.EventHandler(this.classParserToolStripMenuItem_Click);
             // 
             // MainToolStrip
             // 
@@ -185,127 +191,14 @@
             // 
             // MainSplitContainer.Panel1
             // 
-            this.MainSplitContainer.Panel1.Controls.Add(this.TextBoxesPanel);
-            this.MainSplitContainer.Panel1.Controls.Add(this.LabelsPanel);
+            this.MainSplitContainer.Panel1.Controls.Add(this.HexViewer);
             // 
             // MainSplitContainer.Panel2
             // 
             this.MainSplitContainer.Panel2.Controls.Add(this.MainTabControl);
             this.MainSplitContainer.Size = new System.Drawing.Size(764, 379);
-            this.MainSplitContainer.SplitterDistance = 455;
+            this.MainSplitContainer.SplitterDistance = 531;
             this.MainSplitContainer.TabIndex = 5;
-            // 
-            // TextBoxesPanel
-            // 
-            this.TextBoxesPanel.Controls.Add(this.DecodedTextBox);
-            this.TextBoxesPanel.Controls.Add(this.HexTextBox);
-            this.TextBoxesPanel.Controls.Add(this.OffsetTextBox);
-            this.TextBoxesPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TextBoxesPanel.Location = new System.Drawing.Point(0, 18);
-            this.TextBoxesPanel.Name = "TextBoxesPanel";
-            this.TextBoxesPanel.Size = new System.Drawing.Size(455, 361);
-            this.TextBoxesPanel.TabIndex = 3;
-            // 
-            // DecodedTextBox
-            // 
-            this.DecodedTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.DecodedTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.DecodedTextBox.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DecodedTextBox.HideSelection = false;
-            this.DecodedTextBox.LinkedTextBoxes = null;
-            this.DecodedTextBox.Location = new System.Drawing.Point(200, 0);
-            this.DecodedTextBox.Multiline = true;
-            this.DecodedTextBox.Name = "DecodedTextBox";
-            this.DecodedTextBox.ReadOnly = true;
-            this.DecodedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.DecodedTextBox.Size = new System.Drawing.Size(100, 361);
-            this.DecodedTextBox.TabIndex = 2;
-            this.DecodedTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DecodedTextBox_MouseUp);
-            // 
-            // HexTextBox
-            // 
-            this.HexTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.HexTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.HexTextBox.Dock = System.Windows.Forms.DockStyle.Left;
-            this.HexTextBox.HideSelection = false;
-            this.HexTextBox.LinkedTextBoxes = null;
-            this.HexTextBox.Location = new System.Drawing.Point(100, 0);
-            this.HexTextBox.Multiline = true;
-            this.HexTextBox.Name = "HexTextBox";
-            this.HexTextBox.ReadOnly = true;
-            this.HexTextBox.Size = new System.Drawing.Size(100, 361);
-            this.HexTextBox.TabIndex = 1;
-            this.HexTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HexTextBox_KeyUp);
-            this.HexTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HexTextBox_MouseUp);
-            // 
-            // OffsetTextBox
-            // 
-            this.OffsetTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.OffsetTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.OffsetTextBox.Dock = System.Windows.Forms.DockStyle.Left;
-            this.OffsetTextBox.Enabled = false;
-            this.OffsetTextBox.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.OffsetTextBox.LinkedTextBoxes = new System.Windows.Forms.Control[0];
-            this.OffsetTextBox.Location = new System.Drawing.Point(0, 0);
-            this.OffsetTextBox.Multiline = true;
-            this.OffsetTextBox.Name = "OffsetTextBox";
-            this.OffsetTextBox.Size = new System.Drawing.Size(100, 361);
-            this.OffsetTextBox.TabIndex = 0;
-            // 
-            // LabelsPanel
-            // 
-            this.LabelsPanel.Controls.Add(this.DecodedTextLabel);
-            this.LabelsPanel.Controls.Add(this.OffsetsLabel);
-            this.LabelsPanel.Controls.Add(this.OffsetLabel);
-            this.LabelsPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.LabelsPanel.Location = new System.Drawing.Point(0, 0);
-            this.LabelsPanel.Name = "LabelsPanel";
-            this.LabelsPanel.Size = new System.Drawing.Size(455, 18);
-            this.LabelsPanel.TabIndex = 0;
-            // 
-            // DecodedTextLabel
-            // 
-            this.DecodedTextLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.DecodedTextLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.DecodedTextLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DecodedTextLabel.Enabled = false;
-            this.DecodedTextLabel.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.DecodedTextLabel.LinkedTextBoxes = null;
-            this.DecodedTextLabel.Location = new System.Drawing.Point(200, 0);
-            this.DecodedTextLabel.Multiline = true;
-            this.DecodedTextLabel.Name = "DecodedTextLabel";
-            this.DecodedTextLabel.Size = new System.Drawing.Size(100, 18);
-            this.DecodedTextLabel.TabIndex = 2;
-            this.DecodedTextLabel.Text = "Decoded Text";
-            // 
-            // OffsetsLabel
-            // 
-            this.OffsetsLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.OffsetsLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.OffsetsLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.OffsetsLabel.Enabled = false;
-            this.OffsetsLabel.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.OffsetsLabel.LinkedTextBoxes = null;
-            this.OffsetsLabel.Location = new System.Drawing.Point(100, 0);
-            this.OffsetsLabel.Multiline = true;
-            this.OffsetsLabel.Name = "OffsetsLabel";
-            this.OffsetsLabel.Size = new System.Drawing.Size(100, 18);
-            this.OffsetsLabel.TabIndex = 1;
-            // 
-            // OffsetLabel
-            // 
-            this.OffsetLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.OffsetLabel.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.OffsetLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.OffsetLabel.Enabled = false;
-            this.OffsetLabel.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.OffsetLabel.LinkedTextBoxes = null;
-            this.OffsetLabel.Location = new System.Drawing.Point(0, 0);
-            this.OffsetLabel.Multiline = true;
-            this.OffsetLabel.Name = "OffsetLabel";
-            this.OffsetLabel.Size = new System.Drawing.Size(100, 18);
-            this.OffsetLabel.TabIndex = 0;
-            this.OffsetLabel.Text = "Offset";
             // 
             // MainTabControl
             // 
@@ -315,7 +208,7 @@
             this.MainTabControl.Location = new System.Drawing.Point(0, 0);
             this.MainTabControl.Name = "MainTabControl";
             this.MainTabControl.SelectedIndex = 0;
-            this.MainTabControl.Size = new System.Drawing.Size(305, 379);
+            this.MainTabControl.Size = new System.Drawing.Size(229, 379);
             this.MainTabControl.TabIndex = 1;
             // 
             // DetailsTabPage
@@ -324,7 +217,7 @@
             this.DetailsTabPage.Location = new System.Drawing.Point(4, 22);
             this.DetailsTabPage.Name = "DetailsTabPage";
             this.DetailsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.DetailsTabPage.Size = new System.Drawing.Size(297, 353);
+            this.DetailsTabPage.Size = new System.Drawing.Size(221, 353);
             this.DetailsTabPage.TabIndex = 0;
             this.DetailsTabPage.Text = "Details";
             this.DetailsTabPage.UseVisualStyleBackColor = true;
@@ -336,7 +229,7 @@
             this.SelectionPropertyGrid.Location = new System.Drawing.Point(3, 3);
             this.SelectionPropertyGrid.Name = "SelectionPropertyGrid";
             this.SelectionPropertyGrid.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.SelectionPropertyGrid.Size = new System.Drawing.Size(291, 347);
+            this.SelectionPropertyGrid.Size = new System.Drawing.Size(215, 347);
             this.SelectionPropertyGrid.TabIndex = 0;
             this.SelectionPropertyGrid.ToolbarVisible = false;
             // 
@@ -346,7 +239,7 @@
             this.ToolsTabPage.Location = new System.Drawing.Point(4, 22);
             this.ToolsTabPage.Name = "ToolsTabPage";
             this.ToolsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ToolsTabPage.Size = new System.Drawing.Size(297, 353);
+            this.ToolsTabPage.Size = new System.Drawing.Size(221, 353);
             this.ToolsTabPage.TabIndex = 1;
             this.ToolsTabPage.Text = "Tools";
             this.ToolsTabPage.UseVisualStyleBackColor = true;
@@ -358,7 +251,7 @@
             this.SearchToolPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.SearchToolPanel.Location = new System.Drawing.Point(3, 3);
             this.SearchToolPanel.Name = "SearchToolPanel";
-            this.SearchToolPanel.Size = new System.Drawing.Size(291, 95);
+            this.SearchToolPanel.Size = new System.Drawing.Size(215, 95);
             this.SearchToolPanel.TabIndex = 4;
             // 
             // SearchResultsPanel
@@ -367,7 +260,7 @@
             this.SearchResultsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SearchResultsPanel.Location = new System.Drawing.Point(0, 76);
             this.SearchResultsPanel.Name = "SearchResultsPanel";
-            this.SearchResultsPanel.Size = new System.Drawing.Size(291, 19);
+            this.SearchResultsPanel.Size = new System.Drawing.Size(215, 19);
             this.SearchResultsPanel.TabIndex = 7;
             // 
             // SearchResultsLabel
@@ -389,7 +282,7 @@
             this.SearchToolsPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.SearchToolsPanel.Location = new System.Drawing.Point(0, 0);
             this.SearchToolsPanel.Name = "SearchToolsPanel";
-            this.SearchToolsPanel.Size = new System.Drawing.Size(291, 76);
+            this.SearchToolsPanel.Size = new System.Drawing.Size(215, 76);
             this.SearchToolsPanel.TabIndex = 6;
             // 
             // SearchModeComboBox
@@ -409,13 +302,13 @@
             "float"});
             this.SearchModeComboBox.Location = new System.Drawing.Point(7, 20);
             this.SearchModeComboBox.Name = "SearchModeComboBox";
-            this.SearchModeComboBox.Size = new System.Drawing.Size(279, 21);
+            this.SearchModeComboBox.Size = new System.Drawing.Size(203, 21);
             this.SearchModeComboBox.TabIndex = 1;
             // 
             // SearchButton
             // 
             this.SearchButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SearchButton.Location = new System.Drawing.Point(211, 47);
+            this.SearchButton.Location = new System.Drawing.Point(135, 47);
             this.SearchButton.Name = "SearchButton";
             this.SearchButton.Size = new System.Drawing.Size(75, 23);
             this.SearchButton.TabIndex = 3;
@@ -439,20 +332,15 @@
             this.SearchTextBox.Size = new System.Drawing.Size(198, 20);
             this.SearchTextBox.TabIndex = 2;
             // 
-            // editToolStripMenuItem
+            // HexViewer
             // 
-            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.classParserToolStripMenuItem});
-            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
-            this.editToolStripMenuItem.Text = "Edit";
-            // 
-            // classParserToolStripMenuItem
-            // 
-            this.classParserToolStripMenuItem.Name = "classParserToolStripMenuItem";
-            this.classParserToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.classParserToolStripMenuItem.Text = "Class Parser";
-            this.classParserToolStripMenuItem.Click += new System.EventHandler(this.classParserToolStripMenuItem_Click);
+            this.HexViewer.BytesPerLine = 16;
+            this.HexViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.HexViewer.Location = new System.Drawing.Point(0, 0);
+            this.HexViewer.Name = "HexViewer";
+            this.HexViewer.NumberType = Protolumz.NumberType.Decimal;
+            this.HexViewer.Size = new System.Drawing.Size(531, 379);
+            this.HexViewer.TabIndex = 0;
             // 
             // HexEditorForm
             // 
@@ -475,10 +363,6 @@
             this.MainSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitContainer)).EndInit();
             this.MainSplitContainer.ResumeLayout(false);
-            this.TextBoxesPanel.ResumeLayout(false);
-            this.TextBoxesPanel.PerformLayout();
-            this.LabelsPanel.ResumeLayout(false);
-            this.LabelsPanel.PerformLayout();
             this.MainTabControl.ResumeLayout(false);
             this.DetailsTabPage.ResumeLayout(false);
             this.ToolsTabPage.ResumeLayout(false);
@@ -502,11 +386,6 @@
         private System.Windows.Forms.ToolStripComboBox BytePerLineComboBox;
         private System.Windows.Forms.SplitContainer MainSplitContainer;
         private System.Windows.Forms.PropertyGrid SelectionPropertyGrid;
-        private System.Windows.Forms.Panel TextBoxesPanel;
-        private SyncTextBox DecodedTextBox;
-        private SyncTextBox HexTextBox;
-        private SyncTextBox OffsetTextBox;
-        private System.Windows.Forms.Panel LabelsPanel;
         private System.Windows.Forms.ToolStripMenuItem openFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
@@ -515,9 +394,6 @@
         private System.Windows.Forms.TabPage DetailsTabPage;
         private System.Windows.Forms.TabPage ToolsTabPage;
         private System.Windows.Forms.Label SearchLabel;
-        private SyncTextBox DecodedTextLabel;
-        private SyncTextBox OffsetsLabel;
-        private SyncTextBox OffsetLabel;
         private System.Windows.Forms.ToolStripComboBox NumberTypeComboBox;
         private System.Windows.Forms.Button SearchButton;
         private System.Windows.Forms.TextBox SearchTextBox;
@@ -528,5 +404,6 @@
         private System.Windows.Forms.Label SearchResultsLabel;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem classParserToolStripMenuItem;
+        private HexViewer HexViewer;
     }
 }

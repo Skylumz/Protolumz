@@ -76,6 +76,19 @@
     <Compile Include="Forms\TextEditorForm.designer.cs">
       <DependentUpon>TextEditorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Views\HexViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Views\HexViewer.Designer.cs">
+      <DependentUpon>HexViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Views\ImageViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Views\ImageViewer.Designer.cs">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Views\INodeView.cs" />
     <Compile Include="Forms\Winforms\InputBox.cs" />
     <Compile Include="Forms\Winforms\SyncTextBox.cs">
       <SubType>Component</SubType>
@@ -99,6 +112,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TextEditorForm.resx">
       <DependentUpon>TextEditorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Views\HexViewer.resx">
+      <DependentUpon>HexViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Views\ImageViewer.resx">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

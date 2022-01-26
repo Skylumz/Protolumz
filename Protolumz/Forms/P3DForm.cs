@@ -22,7 +22,6 @@ namespace Protolumz
         private P3DFile ActiveFile = null;
 
         private TreeNode RootNode = null;
-
         private TreeNode SelectedNode = null;
 
         public P3DForm(ExplorerForm ef, string fp, byte[] data)
@@ -49,9 +48,35 @@ namespace Protolumz
             Text = "P3D Viewer - Skylumz - " + FileName;
         }
 
+        private int GetImageIndex(P3DNode node)
+        {
+            var parent = node.GetTopMostParent();
+            if(parent is TextureNode)
+            {
+                return 1;
+            }
+            else if(parent is ModelNode)
+            {
+                return 2;
+            }
+            else if (parent is ShaderNode)
+            {
+                return 3;
+            }
+            else if(parent is MetaObjectDefinitionNode)
+            {
+                return 4;
+            }
+            else
+            {
+                return 5;
+            }
+        }
         private void UpdateNode(P3DNode node, TreeNodeCollection parent)
         {
             var tnode = new TreeNode(node.ToString());
+            tnode.ImageIndex = GetImageIndex(node);
+            tnode.SelectedImageIndex = GetImageIndex(node);
             tnode.Tag = node;
 
             foreach (var child in node.Children)
@@ -71,6 +96,8 @@ namespace Protolumz
             MainTreeView.Nodes.Clear();
 
             var root = new TreeNode(ActiveFile.Name);
+            root.ImageIndex = 0;
+            root.SelectedImageIndex = 0;
             root.Tag = ActiveFile;
 
             RootNode = root;
@@ -146,50 +173,37 @@ namespace Protolumz
             if (tag is P3DNode)
             {
                 MainPropertyGrid.SelectedObject = (P3DNode)SelectedNode.Tag;
+                UpdateViewer(tag as P3DNode);
             }
             else if (tag is P3DFile)
             {
                 MainPropertyGrid.SelectedObject = (P3DFile)SelectedNode.Tag;
             }
 
-            if (tag is TextureNode)
-            {
-                ShowTexture(tag as TextureNode);
-            }
         }
-
-
-        private void ShowTexture(TextureNode texture)
+        private void UpdateViewer(P3DNode node)
         {
-            try
+            var viewer = GetViewer(node);
+            viewer.LoadNode(node);
+            var c = (Control)viewer;
+            c.Dock = DockStyle.Fill;
+            ViewTab.Controls.Clear();
+            ViewTab.Controls.Add(c);
+        }
+        private INodeView GetViewer(P3DNode node)
+        {
+            if (node is TextureNode)
             {
-                int cmip = 0;
-                byte[] pixels = DDSIO.GetPixels(texture, cmip);
-                int w = (int)(texture.Width >> cmip);
-                int h = (int)(texture.Height >> cmip);
-                Bitmap bmp = new Bitmap(w, h, PixelFormat.Format32bppArgb);
-
-                if (pixels != null)
-                {
-                    var BoundsRect = new System.Drawing.Rectangle(0, 0, w, h);
-                    BitmapData bmpData = bmp.LockBits(BoundsRect, ImageLockMode.WriteOnly, bmp.PixelFormat);
-                    IntPtr ptr = bmpData.Scan0;
-                    int bytes = bmpData.Stride * bmp.Height;
-                    Marshal.Copy(pixels, 0, ptr, bytes);
-                    bmp.UnlockBits(bmpData);
-                }
-
-                var dimstr = w.ToString() + " x " + h.ToString();
-
-                PictureBox.Image = bmp;
+                var viewer = new ImageViewer();
+                return viewer;
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show("Failure to display: " + texture.Name + " because: " + ex.Message);
+                var viewer = new HexViewer();
+                return viewer;
             }
         }
 
-        
         private void ExtractNodeData()
         {
             var tag = SelectedNode.Tag;
@@ -293,21 +307,6 @@ namespace Protolumz
 
 
 
-
-        private void OpenHexForm()
-        {
-            if (SelectedNode == null) return;
-
-            if (SelectedNode.Tag is P3DNode)
-            {
-                var pn = (P3DNode)SelectedNode.Tag;
-                HexEditorForm form = new HexEditorForm(this, SelectedNode.Text, pn.Data);
-                form.Show(this);
-            }
-        }
-
-
-
         private void MainTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             SelectedNode = e.Node;
@@ -334,10 +333,6 @@ namespace Protolumz
         }
 
         //main tree view context menu
-        private void openHexToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenHexForm();
-        }
         private void extractDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ExtractNodeData();

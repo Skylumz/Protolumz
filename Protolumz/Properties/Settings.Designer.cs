@@ -34,5 +34,17 @@ namespace Protolumz.Properties {
                 this["GameFolder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string StartupFolder {
+            get {
+                return ((string)(this["StartupFolder"]));
+            }
+            set {
+                this["StartupFolder"] = value;
+            }
+        }
     }
 }

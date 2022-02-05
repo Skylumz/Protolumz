@@ -42,6 +42,7 @@
             this.NumberTypeComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.BytePerLineComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.HexViewer = new Protolumz.HexViewer();
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.DetailsTabPage = new System.Windows.Forms.TabPage();
             this.SelectionPropertyGrid = new System.Windows.Forms.PropertyGrid();
@@ -54,7 +55,6 @@
             this.SearchButton = new System.Windows.Forms.Button();
             this.SearchLabel = new System.Windows.Forms.Label();
             this.SearchTextBox = new System.Windows.Forms.TextBox();
-            this.HexViewer = new Protolumz.HexViewer();
             this.MainStatusStrip.SuspendLayout();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
@@ -200,6 +200,15 @@
             this.MainSplitContainer.SplitterDistance = 531;
             this.MainSplitContainer.TabIndex = 5;
             // 
+            // HexViewer
+            // 
+            this.HexViewer.BytesPerLine = 16;
+            this.HexViewer.Location = new System.Drawing.Point(0, 0);
+            this.HexViewer.Name = "HexViewer";
+            this.HexViewer.NumberType = Protolumz.NumberType.Decimal;
+            this.HexViewer.Size = new System.Drawing.Size(246, 158);
+            this.HexViewer.TabIndex = 0;
+            // 
             // MainTabControl
             // 
             this.MainTabControl.Controls.Add(this.DetailsTabPage);
@@ -332,16 +341,6 @@
             this.SearchTextBox.Size = new System.Drawing.Size(198, 20);
             this.SearchTextBox.TabIndex = 2;
             // 
-            // HexViewer
-            // 
-            this.HexViewer.BytesPerLine = 16;
-            this.HexViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.HexViewer.Location = new System.Drawing.Point(0, 0);
-            this.HexViewer.Name = "HexViewer";
-            this.HexViewer.NumberType = Protolumz.NumberType.Decimal;
-            this.HexViewer.Size = new System.Drawing.Size(531, 379);
-            this.HexViewer.TabIndex = 0;
-            // 
             // HexEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -352,7 +351,7 @@
             this.Controls.Add(this.MainStatusStrip);
             this.Controls.Add(this.MainMenuStrip);
             this.Name = "HexEditorForm";
-            this.Text = "HexEditorForm";
+            this.Text = "Hex Editor - by Skylumz";
             this.MainStatusStrip.ResumeLayout(false);
             this.MainStatusStrip.PerformLayout();
             this.MainMenuStrip.ResumeLayout(false);

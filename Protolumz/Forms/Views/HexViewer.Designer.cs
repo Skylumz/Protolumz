@@ -66,7 +66,6 @@
             this.DecodedTextBox.Size = new System.Drawing.Size(100, 506);
             this.DecodedTextBox.TabIndex = 2;
             this.DecodedTextBox.Text = "................";
-            this.DecodedTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DecodedTextBox_MouseUp);
             // 
             // HexTextBox
             // 
@@ -81,8 +80,6 @@
             this.HexTextBox.ReadOnly = true;
             this.HexTextBox.Size = new System.Drawing.Size(100, 506);
             this.HexTextBox.TabIndex = 1;
-            this.HexTextBox.TextChanged += new System.EventHandler(this.HexTextBox_TextChanged);
-            this.HexTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HexTextBox_MouseUp);
             // 
             // OffsetTextBox
             // 

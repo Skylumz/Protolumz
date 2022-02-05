@@ -35,7 +35,7 @@ namespace Protolumz
             IsXml = Path.GetExtension(fp).ToLowerInvariant() == ".xml" ? true : false;
 
             InitForm();
-            UpdateTextTextBox();
+            UpdateTextBox();
         }
 
         private void InitForm()
@@ -44,9 +44,10 @@ namespace Protolumz
             Text = "Text Editor - Skylumz - " + FileName;
         }
 
-        private void UpdateTextTextBox()
+        private void UpdateTextBox()
         {
-            TextTextBox.Text = Encoding.UTF8.GetString(Data);
+            if (Data == null) return;
+            TextTextBox.Text = Encoding.ASCII.GetString(Data);
             UpdateSyntaxHighlighting();
         }
 

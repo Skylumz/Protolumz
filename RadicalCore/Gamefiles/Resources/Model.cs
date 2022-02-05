@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK;
 
 namespace RadicalCore.Gamefiles
 {
@@ -78,6 +79,7 @@ namespace RadicalCore.Gamefiles
             return string.Format("{0} - {1}", Type, Name);
         }
     }
+    
     public class MeshNode : P3DNode
     {
         public uint Unknown1 { get; set; }
@@ -91,6 +93,127 @@ namespace RadicalCore.Gamefiles
             Unknown1 = dr.ReadUInt32();
             Unknown2 = dr.ReadUInt32();
             Name = dr.ReadByteSizedString();
+        }
+
+        public VertexBufferNode GetVertexBufferNode(bool data = false)
+        {
+            foreach (var node in Children)
+            {
+                if (node.Type == P3DNodeType.SkinnedMeshBuffers)
+                {
+                    SkinnedMeshBuffersNode meshnode = node as SkinnedMeshBuffersNode;
+
+                    VertexBufferNode vertnode = null;
+
+                    foreach (var cn in Owner.GetAllNodes())
+                    {
+                        if (cn.Type == P3DNodeType.VertexBuffer)
+                        {
+                            var n = cn as VertexBufferNode;
+                            if (n.Name == ((data) ? meshnode.VertexBufferName : meshnode.SkinnedVertexBufferName))
+                            {
+                                vertnode = n;
+                            }
+                        }
+                    }
+                    return vertnode;
+                }
+                else if (node.Type == P3DNodeType.MeshBuffers)
+                {
+                    MeshBuffersNode meshnode = node as MeshBuffersNode;
+
+                    VertexBufferNode vertnode = null;
+
+                    foreach (var cn in Owner.GetAllNodes())
+                    {
+                        if (cn.Type == P3DNodeType.VertexBuffer)
+                        {
+                            var n = cn as VertexBufferNode;
+                            if (n.Name == meshnode.VertexBufferName)
+                            {
+                                vertnode = n;
+                            }
+                        }
+                    }
+                    return vertnode;
+                }
+            }
+            return null;
+        }
+
+        public List<Vector3> GetVertices()
+        {
+            return GetVertexBufferNode().GetElement("position").Cast<Vector3>().ToList();
+        }
+        public List<Vector3> GetNormals()
+        {
+            return GetVertexBufferNode().GetElement("normal").Cast<Vector3>().ToList();
+        }
+        public List<Vector3> GetTangents()
+        {
+            return GetVertexBufferNode().GetElement("tangent").Cast<Vector3>().ToList();
+        }
+        public List<int> GetBoneWeights()
+        {
+            return GetVertexBufferNode().GetElement("tangent").Cast<int>().ToList();
+        }
+        public List<int> GetBoneIndices()
+        {
+            return GetVertexBufferNode().GetElement("indices").Cast<int>().ToList();
+        }
+        public List<Vector2> GetUVS(string layer = "tex0")
+        {
+            return GetVertexBufferNode(true).GetElement(layer).Cast<Vector2>().ToList();
+        }
+        public List<int> GetColors(string layer = "colour0")
+        {
+            return GetVertexBufferNode(true).GetElement(layer).Cast<int>().ToList();
+        }
+
+        public List<int> GetIndices()
+        {
+            IndexBufferNode indnode = null;
+
+            foreach (var node in Children)
+            {
+                if (node.Type == P3DNodeType.SkinnedMeshBuffers)
+                {
+                    SkinnedMeshBuffersNode meshnode = node as SkinnedMeshBuffersNode;
+
+                    foreach (var cn in Owner.GetAllNodes())
+                    {
+                        if (cn.Type == P3DNodeType.IndexBuffer)
+                        {
+                            var n = cn as IndexBufferNode;
+                            if (n.Name == meshnode.IndexBufferName)
+                            {
+                                indnode = n;
+                            }
+                        }
+                    }
+
+                    return indnode.GetIndices();
+                }
+                else if (node.Type == P3DNodeType.MeshBuffers)
+                {
+                    MeshBuffersNode meshnode = node as MeshBuffersNode;
+
+                    foreach (var cn in Owner.GetAllNodes())
+                    {
+                        if (cn.Type == P3DNodeType.IndexBuffer)
+                        {
+                            var n = cn as IndexBufferNode;
+                            if (n.Name == meshnode.IndexBufferName)
+                            {
+                                indnode = n;
+                            }
+                        }
+                    }
+
+                    return indnode.GetIndices();
+                }
+            }
+            return null;
         }
 
         public override string ToString()
@@ -214,6 +337,38 @@ namespace RadicalCore.Gamefiles
             Unknown6 = dr.ReadUInt32();
         }
 
+        public List<int> GetIndices()
+        {
+            BufferDescriptionNode descnode = null;
+            foreach (var node in Children)
+            {
+                if (node.Type == P3DNodeType.BufferDescription)
+                {
+                    descnode = node as BufferDescriptionNode;
+                }
+            }
+
+            byte[] bufferdata = null;
+            foreach (var node in descnode.Parent.Children)
+            {
+                if (node.Type == P3DNodeType.BufferData)
+                {
+                    bufferdata = (node as BufferDataNode).BufferData;
+                }
+            }
+
+            BufferElement indelem = descnode.Elements[0];
+
+            var indices = new List<int>();
+            for (int i = 0; i < indelem.BufferCount; i++)
+            {
+                var pos = (int)(indelem.TotalSize * i);
+                indices.Add(BitConverter.ToInt16(bufferdata, pos));
+            }
+
+            return indices;
+        }
+
         public override string ToString()
         {
             return string.Format("{0} - {1}", Type, Name);
@@ -246,6 +401,60 @@ namespace RadicalCore.Gamefiles
             Unknown6 = dr.ReadUInt32();
         }
 
+        public List<object> GetElement(string name)
+        {
+            BufferDescriptionNode descnode = null;
+            foreach (var node in Children)
+            {
+                if (node.Type == P3DNodeType.BufferDescription)
+                {
+                    descnode = node as BufferDescriptionNode;
+                }
+            }
+
+            byte[] bufferdata = null;
+            foreach (var node in descnode.Parent.Children)
+            {
+                if (node.Type == P3DNodeType.BufferData)
+                {
+                    bufferdata = (node as BufferDataNode).BufferData;
+                }
+            }
+
+            BufferElement target = null;
+            foreach (var element in descnode.Elements)
+            {
+                if (element.Name == name)
+                {
+                    target = element;
+                }
+            }
+
+            if (target == null) return null;
+
+            var elements = new List<object>();
+
+            for (int i = 0; i < target.BufferCount; i++)
+            {
+                int pos = (int)(target.TotalSize * i) + (int)target.Position;
+                if (name.Contains("tex"))
+                {
+                    var x = BitConverter.ToSingle(bufferdata, pos);
+                    var y = BitConverter.ToSingle(bufferdata, pos + 4);
+                    elements.Add(new Vector2(x, y));
+                }
+                else
+                {
+                    var x = BitConverter.ToSingle(bufferdata, pos);
+                    var y = BitConverter.ToSingle(bufferdata, pos + 4);
+                    var z = BitConverter.ToSingle(bufferdata, pos + 8);
+                    elements.Add(new Vector3(x, y, z));
+                }
+            }
+
+            return elements;
+        }
+
         public override string ToString()
         {
             return string.Format("{0} - {1}", Type, Name);
@@ -254,8 +463,8 @@ namespace RadicalCore.Gamefiles
     public class BufferElement
     {
         public string Name { get; set; }
-        public uint Unk1 { get; set; }
         public uint Count { get; set; }
+        public uint Size { get; set; }
         public uint Position { get; set; }
         public uint TotalSize { get; set; }
         public uint BufferCount { get; set; }
@@ -265,8 +474,8 @@ namespace RadicalCore.Gamefiles
         public void Read(DataReader dr)
         {
             Name = dr.ReadByteSizedString();
-            Unk1 = dr.ReadUInt32();
             Count = dr.ReadUInt32();
+            Position = dr.ReadUInt32();
             Position = dr.ReadUInt32();
             TotalSize = dr.ReadUInt32();
             BufferCount = dr.ReadUInt32();
@@ -359,3 +568,4 @@ namespace RadicalCore.Gamefiles
         }
     }
 }
+

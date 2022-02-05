@@ -34,11 +34,8 @@
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.4.369, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\Protolumz\packages\ICSharpCode.SharpZipLib.dll.0.85.4.369\lib\net20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\Protolumz\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Mathematics, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\Protolumz\packages\SharpDX.Mathematics.4.2.0\lib\net45\SharpDX.Mathematics.dll</HintPath>
+    <Reference Include="OpenTK">
+      <HintPath>..\Protolumz\bin\Debug\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gamefile.cs" />
-    <Compile Include="Gamefiles\P3DFile.cs" />
+    <Compile Include="Gamefiles\FileTypes\P3DFile.cs" />
     <Compile Include="Gamefiles\RcfFile.cs" />
     <Compile Include="Gamefiles\RcfManager.cs" />
     <Compile Include="Gamefiles\Resources\Audio.cs" />
@@ -66,6 +63,7 @@
     <Compile Include="Resources\DataReader.cs" />
     <Compile Include="Resources\DDSIO.cs" />
     <Compile Include="Resources\HashUtil.cs" />
+    <Compile Include="Resources\OBJFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

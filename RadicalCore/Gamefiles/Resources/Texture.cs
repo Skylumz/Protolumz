@@ -1,5 +1,5 @@
-﻿using RadicalCore.Resources;
-using SharpDX;
+﻿using OpenTK;
+using RadicalCore.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;

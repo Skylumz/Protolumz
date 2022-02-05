@@ -32,7 +32,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>packages\OpenTK.3.1.0\lib\net20\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK.GLControl, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>packages\OpenTK.GLControl.3.1.0\lib\net20\OpenTK.GLControl.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -51,6 +60,12 @@
     </Compile>
     <Compile Include="ExplorerForm.Designer.cs">
       <DependentUpon>ExplorerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AssetExplorerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AssetExplorerForm.Designer.cs">
+      <DependentUpon>AssetExplorerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\HexClassCreatorForm.cs">
       <SubType>Form</SubType>
@@ -89,7 +104,14 @@
       <DependentUpon>ImageViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Views\INodeView.cs" />
+    <Compile Include="Forms\Views\MetaViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Views\MetaViewer.Designer.cs">
+      <DependentUpon>MetaViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Winforms\InputBox.cs" />
+    <Compile Include="Forms\Winforms\ListViewSorter.cs" />
     <Compile Include="Forms\Winforms\SyncTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -100,6 +122,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ExplorerForm.resx">
       <DependentUpon>ExplorerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AssetExplorerForm.resx">
+      <DependentUpon>AssetExplorerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\HexClassCreatorForm.resx">
       <DependentUpon>HexClassCreatorForm.cs</DependentUpon>
@@ -119,6 +144,9 @@
     <EmbeddedResource Include="Forms\Views\ImageViewer.resx">
       <DependentUpon>ImageViewer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Views\MetaViewer.resx">
+      <DependentUpon>MetaViewer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -128,6 +156,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -147,5 +177,6 @@
       <Name>RadicalCore</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

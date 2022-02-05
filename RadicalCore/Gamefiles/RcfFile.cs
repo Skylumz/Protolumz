@@ -40,16 +40,15 @@ namespace RadicalCore.Gamefiles
             FilePath = filepath;
         }
 
-        public void Load(Action<string> UpdateStatus, Action<string> LogError)
+        public void Load(Action<string> Log)
         {
             try
             {
                 var fs = new FileStream(FilePath, FileMode.OpenOrCreate);
-                Read(new DataReader(fs));
-                fs.Close();
-
-                //assign entries names from name table
-                UpdateStatus("Assigning name tables to " + Name + "...");
+                var dr = new DataReader(fs);
+                Read(dr);
+                
+                Log($"Assigning name tables to {Name}...");
 
                 var hashedNameTables = NameTables.ToDictionary(x => HashUtil.HashString(x.Name, 0));
                 foreach (var entry in Entries)
@@ -63,8 +62,9 @@ namespace RadicalCore.Gamefiles
                         throw new Exception("Didn't find name table for entry.");
                     }
                 }
+                fs.Close();
 
-                UpdateStatus("Building directory tree for " + Name + "...");
+                Log($"Building directory tree for {Name}...");
 
                 BuildDirectoryTree();
 
@@ -79,11 +79,11 @@ namespace RadicalCore.Gamefiles
                 //}
                 //File.WriteAllText("hashes.txt", sb.ToString());
 
-                UpdateStatus("Finished Scanning: " + Name);
+                Log($"Finished Scanning {Name}");
             }
             catch (Exception ex)
             {
-                LogError("Error reading: " + Name + " because: " + ex.ToString());
+                Log($"Error reading {Name} because {ex.ToString()}");
                 LastException = ex;
             }
         }
@@ -148,16 +148,16 @@ namespace RadicalCore.Gamefiles
             }
 
             DataReader dr = new DataReader(new MemoryStream(File.ReadAllBytes(FilePath)));
-            dr.Position = entry.DataPointer;
+            dr.Position = entry.Offset;
 
-            byte[] data;
+            byte[] data = null;
             dr.Endianess = Endianess.BigEndian;
             var magic = dr.ReadUInt32();
             dr.Endianess = Endianess.LittleEndian;
             if (magic != 0x525A0000 || !uncompressed) //rz magic
             {
                 dr.Position -= 4;
-                data = dr.ReadBytes((int)entry.Size);
+                data = dr.ReadBytes((int)entry.Length);
             }
             else
             {
@@ -190,7 +190,7 @@ namespace RadicalCore.Gamefiles
                 }
             }
 
-            RootDirectory = new RcfDirectory(this, Name);
+            RootDirectory = new RcfRootDirectory(this, Name);
             var alldirectories = new List<RcfDirectory>() { RootDirectory };
             foreach (var path in paths)
             {
@@ -237,8 +237,8 @@ namespace RadicalCore.Gamefiles
     {
         //structure data
         public uint NameHash { get; set; }
-        public uint DataPointer { get; set; }
-        public uint Size { get; set; }
+        public uint Offset { get; set; }
+        public uint Length { get; set; }
 
         //reference data
         public string Name { get { return (NameTable != null) ? Path.GetFileName(NameTable.Name) : ""; } }
@@ -256,8 +256,8 @@ namespace RadicalCore.Gamefiles
         public void Read(DataReader dr)
         {
             NameHash = dr.ReadUInt32();
-            DataPointer = dr.ReadUInt32();
-            Size = dr.ReadUInt32();
+            Offset = dr.ReadUInt32();
+            Length = dr.ReadUInt32();
 
             ////read data
             //var savedPosition = dr.Position;
@@ -328,7 +328,7 @@ namespace RadicalCore.Gamefiles
                 return string.Join("\\", path);
             }
         }
-        public string FullNameWithOwner
+        public virtual string FullNameWithOwner
         {
             get
             {
@@ -352,10 +352,11 @@ namespace RadicalCore.Gamefiles
             Directories = new List<RcfDirectory>();
             Files = new List<RcfEntry>();   
         }
-
-        public override string ToString()
-        {
-            return FullName;
-        }
+    }
+    public class RcfRootDirectory : RcfDirectory
+    {
+        public override string FullNameWithOwner { get { return Owner.FilePath; } }
+        public RcfRootDirectory(RcfFile owner) : base(owner) { }
+        public RcfRootDirectory(RcfFile owner, string name) : base(owner, name) { }
     }
 }

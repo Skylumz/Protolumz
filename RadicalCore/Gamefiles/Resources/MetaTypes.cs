@@ -1,7 +1,8 @@
-﻿using RadicalCore.Resources;
-using SharpDX;
+﻿using OpenTK;
+using RadicalCore.Resources;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -162,12 +163,54 @@ namespace RadicalCore.Gamefiles
             dr.Position += NodeDataLength;
         }
 
+        public MetaData GetMeta()
+        {
+            MetaData data = null;
+            switch((Parent as MetaObjectDefinitionNode).MetaType)
+            {
+                case MetaType.PropRestoreDataArray:
+                    data = new PropRestoreArray();
+                    break;
+            }
+
+            if (data == null) return data;
+
+            var dr = new DataReader(new MemoryStream(NodeData));
+            dr.Position = 20;
+            data.Read(dr);
+
+            return data;
+        }
+
         public override string ToString()
         {
             return string.Format("{0} - {1} bytes", Type, NodeDataLength);
         }
     }
 
+    public interface MetaData { void Read(DataReader dr); }
+    public class PropRestoreArray : MetaData
+    {
+        public uint PropCount { get; set; }
+        public List<Prop> Props { get; set; }
+
+        public void Read(DataReader dr)
+        {
+            PropCount = dr.ReadUInt32();
+            Props = new List<Prop>();
+            for (int i = 0; i < PropCount; i++)
+            {
+                var p = new Prop();
+                p.Read(dr);
+                Props.Add(p);
+            }
+        }
+
+        public void Write(DataWriter dw)
+        {
+
+        }
+    }
     public class Prop
     {
         public uint NameLength { get; set; }
@@ -194,28 +237,6 @@ namespace RadicalCore.Gamefiles
             }
             Unknown1 = dr.ReadUInt32();
             Unknown2 = dr.ReadUInt32();
-        }
-
-        public void Write(DataWriter dw)
-        {
-
-        }
-    }
-    public class PropRestoreArray
-    {
-        public uint PropCount { get; set; }
-        public List<Prop> Props { get; set; }
-
-        public void Read(DataReader dr)
-        {
-            PropCount = dr.ReadUInt32();
-            Props = new List<Prop>();
-            for (int i = 0; i < PropCount; i++)
-            {
-                var p = new Prop();
-                p.Read(dr);
-                Props.Add(p);
-            }
         }
 
         public void Write(DataWriter dw)

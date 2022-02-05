@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Protolumz.Forms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Protolumz
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ExplorerForm());
+            Application.Run(new MainForm());
         }
     }
 }

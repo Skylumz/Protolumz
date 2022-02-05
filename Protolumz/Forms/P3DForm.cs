@@ -1,5 +1,7 @@
-﻿using Protolumz.Resources;
+﻿using OpenTK;
+using Protolumz.Resources;
 using RadicalCore.Gamefiles;
+using RadicalCore.Resources;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,22 +32,32 @@ namespace Protolumz
 
             Owner = ef;
             Icon = Owner.Icon;
-            
+
             OpenFile(fp, data);
         }
 
         private void OpenFile(string fp, byte[] data)
         {
-            FilePath = fp;
-            ActiveFile = new P3DFile(fp);
-            ActiveFile.Load(data);
-            UpdateTitle();
-            BuildTree();
+            Task.Run(() =>
+            {
+                FilePath = fp;
+                ActiveFile = new P3DFile(fp);
+                ActiveFile.Load(data);
+                UpdateTitle();
+                BuildTree();
+            });
         }
 
         private void UpdateTitle()
         {
-            Text = "P3D Viewer - Skylumz - " + FileName;
+            if (InvokeRequired)
+            {
+                Invoke(new Action(()=> UpdateTitle()));
+            }
+            else
+            {
+                Text = "P3D Viewer - Skylumz - " + FileName;
+            }
         }
 
         private int GetImageIndex(P3DNode node)
@@ -88,28 +100,35 @@ namespace Protolumz
         }
         private void BuildTree()
         {
-            if (ActiveFile == null) return;
-
-            MainPropertyGrid.SelectedObject = ActiveFile;
-
-            MainTreeView.BeginUpdate();
-            MainTreeView.Nodes.Clear();
-
-            var root = new TreeNode(ActiveFile.Name);
-            root.ImageIndex = 0;
-            root.SelectedImageIndex = 0;
-            root.Tag = ActiveFile;
-
-            RootNode = root;
-
-            foreach (var node in ActiveFile.Nodes)
+            if (InvokeRequired)
             {
-                UpdateNode(node, root.Nodes);
+                Invoke(new Action(() => BuildTree()));
             }
+            else
+            {
+                if (ActiveFile == null) return;
 
-            MainTreeView.Nodes.Add(root);
-            root.Expand();
-            MainTreeView.EndUpdate();
+                MainPropertyGrid.SelectedObject = ActiveFile;
+
+                MainTreeView.BeginUpdate();
+                MainTreeView.Nodes.Clear();
+
+                var root = new TreeNode(ActiveFile.Name);
+                root.ImageIndex = 0;
+                root.SelectedImageIndex = 0;
+                root.Tag = ActiveFile;
+
+                RootNode = root;
+
+                foreach (var node in ActiveFile.Nodes)
+                {
+                    UpdateNode(node, root.Nodes);
+                }
+
+                MainTreeView.Nodes.Add(root);
+                root.Expand();
+                MainTreeView.EndUpdate();
+            }
         }
         private void Search(string term)
         {
@@ -174,12 +193,19 @@ namespace Protolumz
             {
                 MainPropertyGrid.SelectedObject = (P3DNode)SelectedNode.Tag;
                 UpdateViewer(tag as P3DNode);
+                UpdateContextMenu();
             }
             else if (tag is P3DFile)
             {
                 MainPropertyGrid.SelectedObject = (P3DFile)SelectedNode.Tag;
             }
 
+            
+        }
+        private void UpdateContextMenu()
+        {
+            saveOBJToolStripMenuItem.Enabled = (SelectedNode.Tag is MeshNode) || (SelectedNode.Tag is ModelNode);
+            saveTextureToolStripMenuItem.Enabled = (SelectedNode.Tag is TextureNode);
         }
         private void UpdateViewer(P3DNode node)
         {
@@ -195,6 +221,11 @@ namespace Protolumz
             if (node is TextureNode)
             {
                 var viewer = new ImageViewer();
+                return viewer;
+            }
+            else if(node is MetaObjectDataNode)
+            {
+                var viewer = new MetaViewer();
                 return viewer;
             }
             else
@@ -275,14 +306,89 @@ namespace Protolumz
             }
         }
 
-        private void ExtractOBJ()
+        private void SaveOBJ(bool saveall = false)
         {
-            if (!(SelectedNode.Tag is ModelNode)) return;
+            StringBuilder errors = new StringBuilder();
+            OBJFile obj = new OBJFile();
 
-            var modelnode = SelectedNode.Tag as ModelNode;
+            if (saveall)
+            {
+                obj.Name = Path.GetFileNameWithoutExtension(ActiveFile.Name);
+                foreach(var node in ActiveFile.Nodes)
+                {
+                    if (node is ModelNode)
+                    {
+                        foreach(var childnode in node.Children)
+                        {
+                            if (childnode is MeshNode)
+                            {
+                                try
+                                {
+                                    obj.AddMesh(childnode as MeshNode);
+                                }
+                                catch (Exception ex)
+                                {
+                                    errors.AppendLine("Mesh: " + (childnode as MeshNode).Name + " unable to export because: " + ex.ToString());
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (SelectedNode.Tag is ModelNode)
+                {
+                    var modelnode = SelectedNode.Tag as ModelNode;
+                    obj.Name = modelnode.Name;
+                    foreach (var node in modelnode.Children)
+                    {
+                        if (node is MeshNode)
+                        {
+                            try
+                            {
+                                obj.AddMesh(node as MeshNode);
+                            }
+                            catch(Exception ex)
+                            {
+                                errors.AppendLine("Mesh: " + (node as MeshNode).Name + " unable to export because: " + ex.ToString());
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var meshnode = SelectedNode.Tag as MeshNode;
+                    obj.Name = meshnode.Name;
+                    try
+                    {
+                        obj.AddMesh(meshnode);
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.AppendLine("Mesh: " + meshnode.Name + " unable to export because: " + ex.ToString());
+                    }
+                }
+
+                if (errors.ToString().Length > 0)
+                {
+                    MessageBox.Show("Errors encountered", errors.ToString());
+                }
+            }
+
+            using (var sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "OBJ File|*.obj";
+                sfd.FileName = obj.Name;
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    obj.Save(sfd.FileName);
+                }
+            }
         }
-
-        private void ExtractTexture()
+        //change to save actuall dds file
+        private void SaveDDS()
         {
             if (!(SelectedNode.Tag is TextureNode)) return;
 
@@ -305,20 +411,21 @@ namespace Protolumz
             }
         }
 
-
-
         private void MainTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             SelectedNode = e.Node;
             UpdateUI();
         }
-        private void SearchTextBox_TextChanged(object sender, EventArgs e)
+        private void SearchTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            Search(SearchTextBox.Text);
+            if(e.KeyCode == Keys.Enter)
+            {
+                Search(SearchTextBox.Text);
+            }
         }
         private void combinedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            combinedToolStripMenuItem.Checked = !combinedToolStripMenuItem.Checked;
+            extractCombinedToolStripMenuItem.Checked = !extractCombinedToolStripMenuItem.Checked;
         }
         private void openFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -337,17 +444,22 @@ namespace Protolumz
         {
             ExtractNodeData();
         }
-        private void extractOBJToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ExtractOBJ();
-        }
         private void extractTextureToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExtractTexture();
+            SaveDDS();
         }
         private void extractCheckedToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            ExtractNodesChecked(combinedToolStripMenuItem.Checked);
+            ExtractNodesChecked(extractCombinedToolStripMenuItem.Checked);
+        }
+
+        private void saveOBJToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveOBJ();
+        }
+        private void oBJToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveOBJ(true);
         }
     }
 }

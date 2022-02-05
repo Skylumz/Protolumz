@@ -1,4 +1,4 @@
-﻿using SharpDX;
+﻿using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -227,9 +227,9 @@ namespace RadicalCore.Resources
             return v;
         }
 
-        public Matrix ReadMatrix()
+        public Matrix4x3 ReadMatrix()
         {
-            Matrix m = new Matrix();
+            Matrix4x3 m = new Matrix4x3();
             m.M11 = ReadSingle();
             m.M21 = ReadSingle();
             m.M31 = ReadSingle();
@@ -242,10 +242,10 @@ namespace RadicalCore.Resources
             m.M23 = ReadSingle();
             m.M33 = ReadSingle();
             m.M43 = ReadSingle();
-            m.M14 = ReadSingle();
-            m.M24 = ReadSingle();
-            m.M34 = ReadSingle();
-            m.M44 = ReadSingle();
+            //m.M14 = ReadSingle();
+            //m.M24 = ReadSingle();
+            //m.M34 = ReadSingle();
+            //m.M44 = ReadSingle();
             return m;
         }
 

@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpDX;
+using OpenTK;
 
 namespace RadicalCore.Gamefiles
 {
@@ -378,7 +378,7 @@ namespace RadicalCore.Gamefiles
                     node = new GFXNode();
                     break;
             }
-            
+
             node.Offset = dr.Position;
             try
             {
@@ -393,7 +393,7 @@ namespace RadicalCore.Gamefiles
             dr.Position = node.Offset;
             node.Data = dr.ReadBytes((int)node.HeaderSize);
 
-            //dr.Position = start + node.HeaderSize;
+            dr.Position = start + node.HeaderSize;
 
             if (dr.Position != start + node.HeaderSize)
             {
@@ -402,9 +402,9 @@ namespace RadicalCore.Gamefiles
 
             var end = start + node.Size;
 
-            while(dr.Position != end)
+            while (dr.Position != end)
             {
-                var child = P3DNode.ReadNode(dr, owner, node);
+                var child = ReadNode(dr, owner, node);
                 node.Children.Add(child);
             }
 

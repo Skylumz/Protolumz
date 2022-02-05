@@ -15,12 +15,12 @@ namespace Protolumz
 {
     public partial class ExplorerForm : Form
     {
-        private const string exename = "prototype2.exe";
+        private const string _exename = "prototype2.exe";
         private string gameFolder
-        { 
-            get 
-            { 
-                return Properties.Settings.Default.GameFolder; 
+        {
+            get
+            {
+                return Properties.Settings.Default.GameFolder;
             }
             set
             {
@@ -29,7 +29,7 @@ namespace Protolumz
             }
         }
 
-        private RcfManager RcfMan;
+        private RcfManager RcfMan = null;
 
         public Dictionary<string, int> FileTypeImageIndexDict = new Dictionary<string, int>()
         {
@@ -53,13 +53,18 @@ namespace Protolumz
             { "jpeg", 8 },
             { "bik", 9 },
             { "exeicon", 0 },
-            
+
 
             { "rcf", 3 },
-            { "p3d", 21 },
+            { "p3d", 10 },
         };
         private TreeNode SelectedNode = null;
-        
+
+        private List<string> stringLog = new List<string>();
+        private TextEditorForm consoleForm = null;
+
+        private List<TreeNode> history = new List<TreeNode>();
+
         public ExplorerForm()
         {
             InitializeComponent();
@@ -78,12 +83,14 @@ namespace Protolumz
 
             this.Icon = Icon.ExtractAssociatedIcon(gameFolder);
             MainImageList.Images[0] = this.Icon.ToBitmap();
+            MainListView.ListViewItemSorter = new ListViewColumnSorter();
 
             RcfMan = new RcfManager();
             Task.Run(() =>
             {
-                RcfMan.Init(Path.GetDirectoryName(gameFolder), UpdateStatus, LogError);
+                RcfMan.Init(Path.GetDirectoryName(gameFolder), UpdateStatus);
                 RefreshMainTreeView();
+                SetStartupFolder(Properties.Settings.Default.StartupFolder);
             });
         }
 
@@ -92,23 +99,23 @@ namespace Protolumz
 
         private bool EnsureGameFolder()
         {
-            if (!gameFolder.Contains(exename))
+            if (!gameFolder.Contains(_exename))
             {
                 bool isOk = false;
                 bool cancel = false;
                 while ((!isOk & !cancel) == true)
                 {
-                    cancel = YesNoMessageBox("Would you like to select a folder that contains "  + exename, "Select Folder");
+                    cancel = YesNoMessageBox($"Would you like to select a folder that contains {_exename}", "Select Folder");
                     if (cancel) continue;
                     var fld = GetFolder();
                     if (string.IsNullOrEmpty(fld)) continue;
                     var info = new DirectoryInfo(fld);
                     foreach (var file in info.GetFiles())
                     {
-                        if (file.Name.Contains(exename))
+                        if (file.Name.Contains(_exename))
                         {
                             isOk = true;
-                            gameFolder = file.FullName;
+                            gameFolder = info.FullName;
                             return true;
                         }
                     }
@@ -153,6 +160,28 @@ namespace Protolumz
 
 
 
+        private void UpdateStatus(string text)
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new Action(() => UpdateStatus(text)));
+            }
+            else
+            {
+                stringLog.Add(text);
+                StatusLabel.Text = text;
+            }
+        }
+        private void Log(string text, bool showMessageBox = false)
+        {
+            stringLog.Add(text);
+            if (showMessageBox)
+            {
+                MessageBox.Show(text, "Error");
+            }
+        }
+        
+        
         private void UpdateUI()
         {
             if (SelectedNode == null) return;
@@ -177,6 +206,26 @@ namespace Protolumz
             }
             else { ListViewSelectedCountLabel.Text = ""; }
 
+            bool issearch = SelectedNode.Tag is List<ListViewItem> ? true : false;
+            bool single = MainListView.SelectedItems.Count == 1 ? true : false;
+            bool isfile = MainListView.SelectedItems.Count > 0 ? MainListView.SelectedItems[0].Tag is FileInfo || 
+                MainListView.SelectedItems[0].Tag is RcfEntry ? true : false : false;
+            bool singlefile = single & isfile;
+
+            openFileLocationToolStripMenuItem.Enabled = issearch;
+            viewToolStripMenuItem.Enabled = single;
+            viewToolStripMenuItem1.Enabled = single;
+            viewHexToolStripMenuItem.Enabled = singlefile;
+            viewHexToolStripMenuItem1.Enabled = singlefile;
+            extractRawToolStripMenuItem.Enabled = singlefile;
+            extractRawToolStripMenuItem1.Enabled = singlefile;
+            extractUncompressedToolStripMenuItem.Enabled = singlefile;
+            extractUncompressedToolStripMenuItem1.Enabled = singlefile;
+            copyToolStripMenuItem.Enabled = singlefile;
+            copyToolStripMenuItem1.Enabled = singlefile;
+            copyPathToolStripMenuItem.Enabled = single;
+
+            //update column sizes
             for (int i = 0; i < MainListView.Columns.Count; i++)
             {
                 var wth = -1;
@@ -186,30 +235,6 @@ namespace Protolumz
                 col.Width = wth;
             }
         }
-        private void UpdateStatus(string text)
-        {
-            if (InvokeRequired)
-            {
-                BeginInvoke(new Action(() => UpdateStatus(text)));
-            }
-            else
-            {
-                StatusLabel.Text = text;
-                
-            }
-        }
-        private void LogError(string text) 
-        {
-            if (InvokeRequired)
-            {
-                BeginInvoke(new Action(() => UpdateStatus(text)));
-            }
-            else
-            {
-                MessageBox.Show(text);
-            }
-        }
-
 
         public int GetImageIndex(string ext)
         {
@@ -246,10 +271,7 @@ namespace Protolumz
         }
         private object[] CacheDetails(RcfEntry entry)
         {
-            var ext = Path.GetExtension(entry.Name);
-            if (!string.IsNullOrEmpty(ext)) ext = ext.Substring(1);
-            else ext = "UNKNOWN";
-
+            var ext = Path.GetExtension(entry.Name).Substring(1);
             string attr = "";
             switch (ext)
             {
@@ -258,8 +280,8 @@ namespace Protolumz
                     break;
             }
             var details = new List<object>() { GetImageIndex(ext), ext.ToUpper() + " File",
-                string.Format("{0:n0}", Math.Round((double)entry.Size / 1024)) + " KB", attr, entry.FullName};
-            
+                string.Format("{0:n0}", Math.Round((double)entry.Length / 1024)) + " KB", attr, entry.FullName};
+
             return details.ToArray();
         }
         private object[] CacheDetails(RcfDirectory dir)
@@ -318,7 +340,7 @@ namespace Protolumz
         private List<ListViewItem> GetListViewItems(TreeNode node)
         {
             if (node == null) return null;
-            
+
             var items = new List<ListViewItem>();
             if (node.Tag is DirectoryInfo)
             {
@@ -332,14 +354,14 @@ namespace Protolumz
                     items.Add(GetListViewItem(cdir));
                 }
             }
-            else if(node.Tag is RcfDirectory)
+            else if (node.Tag is RcfDirectory)
             {
                 var dir = node.Tag as RcfDirectory;
-                foreach(var file in dir.Files)
+                foreach (var file in dir.Files)
                 {
                     items.Add(GetListViewItem(file));
                 }
-                foreach(var cdir in dir.Directories)
+                foreach (var cdir in dir.Directories)
                 {
                     items.Add(GetListViewItem(cdir));
                 }
@@ -370,11 +392,11 @@ namespace Protolumz
         {
             TreeNode node = new TreeNode(dir.Name);
             node.Tag = dir;
-            var imgkey = dir.Name.Contains("rcf") ? "rcf" : "folder"; 
+            var imgkey = dir.Name.Contains("rcf") ? "rcf" : "folder";
             node.ImageIndex = FileTypeImageIndexDict[imgkey];
             node.SelectedImageIndex = node.ImageIndex;
 
-            foreach(var cdir in dir.Directories)
+            foreach (var cdir in dir.Directories)
             {
                 node.Nodes.Add(GetTreeNode(cdir));
             }
@@ -399,7 +421,7 @@ namespace Protolumz
             {
                 foreach (var file in folder.GetFiles())
                 {
-                    if (file.Extension.ToLowerInvariant().Contains("rcf"))
+                    if (file.Extension.ToLowerInvariant().EndsWith("rcf"))
                     {
                         RcfFile rcf = RcfMan.GetRcfFile(file.Name);
                         if (rcf == null) continue;
@@ -427,7 +449,7 @@ namespace Protolumz
                     if (rcf == null)
                     {
                         rcf = new RcfFile(path);
-                        rcf.Load(UpdateStatus, LogError);
+                        rcf.Load(UpdateStatus);
                         RcfMan.AddRcfFile(rcf);
                     }
                     node = GetTreeNode(rcf.RootDirectory);
@@ -466,9 +488,22 @@ namespace Protolumz
         }
 
 
+        private void SetStartupFolder(string folder)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => SetStartupFolder(folder)));
+            }
+            else
+            {
+                Properties.Settings.Default.StartupFolder = folder;
+                Properties.Settings.Default.Save();
+                StartUpFolderMenuItem.Text = new DirectoryInfo(folder).Name;
+                SelectNode(folder);
+            }
+        }
 
-
-        private TreeNode SelectNode(string name, TreeNode parent=null)
+        private TreeNode SelectNode(string name, TreeNode parent = null)
         {
             if (InvokeRequired)
             {
@@ -477,8 +512,7 @@ namespace Protolumz
             else
             {
                 //if (SelectedNode.Text == name) return SelectedNode;
-
-                var nodes = (parent == null) ? TreeCollectionToList(MainTreeView.Nodes[0].Nodes) : TreeCollectionToList(parent.Nodes);
+                var nodes = (parent == null) ? GetAllNodes(MainTreeView.Nodes[0]) : TreeCollectionToList(parent.Nodes);
                 foreach (TreeNode node in nodes)
                 {
                     if (node.Text == name)
@@ -493,6 +527,7 @@ namespace Protolumz
         }
         private TreeNode SelectNode(string path)
         {
+            if (PathTextBox.Text == path) return SelectedNode; //dont reselect the same node...
             var hierarchy = path.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
             var n = MainTreeView.Nodes[0];
             if (!string.IsNullOrEmpty(path))
@@ -511,7 +546,7 @@ namespace Protolumz
         private void SelectNode(int index)
         {
             var nodes = new List<TreeNode>();
-            foreach(TreeNode node in MainTreeView.Nodes)
+            foreach (TreeNode node in MainTreeView.Nodes)
             {
                 nodes.AddRange(GetAllNodes(node));
             }
@@ -530,57 +565,60 @@ namespace Protolumz
         private List<TreeNode> TreeCollectionToList(TreeNodeCollection nodes)
         {
             List<TreeNode> result = new List<TreeNode>();
-            foreach(TreeNode node in nodes)
+            foreach (TreeNode node in nodes)
             {
                 result.Add(node);
             }
             return result;
         }
-        
+
 
         private void Search(string term)
         {
             UpdateStatus("Searching...");
             Cursor = Cursors.WaitCursor;
 
-            TreeNode node = new TreeNode("Search Results: " + term);
-            node.ImageIndex = 1;
-            node.SelectedImageIndex = 1;
-
-            var items = new List<ListViewItem>();
-            foreach (TreeNode mnode in MainTreeView.Nodes)
+            var name = "Search Results: " + term;
+            TreeNode node = SelectNode(name); //try get previously found results...
+            if (node == null)
             {
-                var nodes = GetAllNodes(mnode);
-                foreach (TreeNode cnode in nodes)
+                node = new TreeNode(name);
+                node.ImageIndex = 1;
+                node.SelectedImageIndex = 1;
+
+                var items = new List<ListViewItem>();
+                foreach (TreeNode mnode in MainTreeView.Nodes)
                 {
-                    if (cnode.Tag is DirectoryInfo)
+                    var nodes = GetAllNodes(mnode);
+                    foreach (TreeNode cnode in nodes)
                     {
-                        var dir = cnode.Tag as DirectoryInfo;
-                        var files = dir.GetFiles("*" + term + "*", SearchOption.TopDirectoryOnly);
-                        foreach (var file in files)
+                        if (cnode.Tag is DirectoryInfo)
                         {
-                            items.Add(GetListViewItem(file));
-                        }
-                    }
-                    else if (cnode.Tag is RcfDirectory)
-                    {
-                        var dir = cnode.Tag as RcfDirectory;
-                        foreach (var file in dir.Files)
-                        {
-                            if (file.Name.Contains(term))
+                            var dir = cnode.Tag as DirectoryInfo;
+                            var files = dir.GetFiles("*" + term + "*", SearchOption.TopDirectoryOnly);
+                            foreach (var file in files)
                             {
                                 items.Add(GetListViewItem(file));
                             }
                         }
+                        else if (cnode.Tag is RcfDirectory)
+                        {
+                            var dir = cnode.Tag as RcfDirectory;
+                            foreach (var file in dir.Files)
+                            {
+                                if (file.Name.Contains(term))
+                                {
+                                    items.Add(GetListViewItem(file));
+                                }
+                            }
+                        }
                     }
                 }
+                node.Tag = items;
+                MainTreeView.Nodes[0].Nodes.Add(node);
             }
-
-
-            node.Tag = items;
-            MainTreeView.Nodes.Add(node);
+            
             MainTreeView.SelectedNode = node;
-
             Cursor = Cursors.Default;
             UpdateStatus("Search Complete");
         }
@@ -594,10 +632,10 @@ namespace Protolumz
                 SelectNode(text, null);
             }
 
-            var searchitems = GetListViewItems(SelectedNode)
+            var searchitems = GetListViewItems(SelectedNode);
             if (searchitems == null) return;
             var items = new List<ListViewItem>();
-            foreach(ListViewItem item in searchitems)
+            foreach (ListViewItem item in searchitems)
             {
                 if (item.Text.ToLowerInvariant().Contains(term.ToLowerInvariant()))
                 {
@@ -608,12 +646,11 @@ namespace Protolumz
         }
         private void GoForward()
         {
-            MessageBox.Show("TODO");
         }
         private void GoBack()
         {
-            MessageBox.Show("TODO");
         }
+
 
 
         private void OpenFileLocation()
@@ -632,7 +669,14 @@ namespace Protolumz
                 else if (item.Tag is FileInfo)
                 {
                     var file = item.Tag as FileInfo;
-                    node = SelectNode(file.DirectoryName);
+                    if (file.Name.EndsWith("rcf"))
+                    {
+                        node = SelectNode(file.Name, null);
+                    }
+                    else
+                    {
+                        node = SelectNode(file.Directory.Name, null);
+                    }
                 }
                 else if (item.Tag is RcfEntry)
                 {
@@ -641,13 +685,17 @@ namespace Protolumz
                 }
                 else if (item.Tag is RcfDirectory) { } //should never be used..
                 else { }
-                
-                if (node == null)
+
+                if (node == null) return;
+
+                foreach (ListViewItem i in MainListView.Items)
                 {
-                    MessageBox.Show("File location not found..."); //? should never happen
+                    if (i.Text == item.Text)
+                    {
+                        i.Selected = true;
+                    }
                 }
             }
-            else { } //multiple items...?
         }
 
         private void ViewFile()
@@ -656,7 +704,7 @@ namespace Protolumz
             {
                 var idx = MainListView.SelectedIndices[0];
                 var item = MainListView.Items[idx];
-                
+
                 string filepath = "";
                 byte[] data = null;
 
@@ -671,10 +719,10 @@ namespace Protolumz
                     var file = item.Tag as FileInfo;
                     if (file.Extension.ToLowerInvariant().Contains("rcf"))
                     {
-                        var n = SelectNode(item.Text, SelectedNode);
+                        var n = SelectNode(file.Name, null);
                         if (n == null)
                         {
-                            //var rcf = RcfMan.GetRcfFile(file.Name);
+                            var rcf = RcfMan.GetRcfFile(file.Name);
                             //n = AddMainTreeViewNode(file.FullName, "rcf", SelectedNode);
                             //SelectNode(item.Text, SelectedNode);
                         }
@@ -701,7 +749,6 @@ namespace Protolumz
 
                 ViewFile(filepath, data);
             }
-            else { } //multiple items...?
         }
         private void ViewFile(string filepath, byte[] data)
         {
@@ -745,44 +792,211 @@ namespace Protolumz
         private void OpenHexForm(string filepath, byte[] data)
         {
             HexEditorForm form = new HexEditorForm(this, filepath, data);
-            form.Show(this);
+            form.Show();
         }
-        
 
+
+        private void ExtractFile(ListViewItem item, bool uncompressed, string folder)
+        {
+            var name = "";
+            var data = new byte[0];
+            var from = "";
+
+            if (item.Tag is FileInfo)
+            {
+                var file = item.Tag as FileInfo;
+                if (file.Length > 5e+8)
+                {
+                    throw new Exception("file larger than 500mbs.");
+                }
+
+                name = file.Name;
+                data = File.ReadAllBytes(file.FullName);
+                from = file.Directory.FullName;
+            }
+            else if (item.Tag is RcfEntry)
+            {
+                var entry = item.Tag as RcfEntry;
+                if (entry.Length > 5e+8)
+                {
+                    throw new Exception("file larger than 500mbs.");
+                }
+
+                name = (uncompressed == true && entry.Name.EndsWith("rz")) ? Path.ChangeExtension(entry.Name, null) : entry.Name;
+                data = entry.Owner.GetData(entry, uncompressed);
+                from = entry.Owner.Name;
+            }
+            
+
+            File.WriteAllBytes(Path.Combine(folder, name), data);
+            Log($"Extracted {name} from {from}");
+        }
         private void ExtractFile(bool uncompressed = false)
         {
-            if (MainListView.SelectedIndices.Count == 1)
+            StringBuilder errors = new StringBuilder();
+
+            var folder = GetFolder();
+            if (folder == "")
             {
-                var idx = MainListView.SelectedIndices[0];
+                Log("Please choose a valid folder.", true);
+                return;
+            }
+
+            foreach (int idx in MainListView.SelectedIndices)
+            {
                 var item = MainListView.Items[idx];
-                var name = "";
-                var data = new byte[0];
-                var folder = GetFolder();
 
                 try
                 {
-                    if (item.Tag is FileInfo)
-                    {
-                        var file = item.Tag as FileInfo;
-                        name = file.Name;
-                        data = File.ReadAllBytes(file.FullName);
-                    }
-                    else if (item.Tag is RcfEntry)
-                    {
-                        var entry = item.Tag as RcfEntry;
-                        name = (uncompressed == true && entry.Name.EndsWith("rz")) ? Path.ChangeExtension(entry.Name, null) : entry.Name;
-                        data = entry.Owner.GetData(entry, uncompressed);
-                    }
-
-                    File.WriteAllBytes(Path.Combine(folder, name), data);
+                    ExtractFile(item, uncompressed, folder);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(string.Format("Failure to extract: {0} because {1}", item.Text, ex));
+                    errors.AppendLine($"Failure to extract {item.Text} because {ex.Message}");
                 }
             }
-            else { } //multiple items...?
+
+            if (errors.Length > 0)
+            {
+                Log(errors.ToString(), true);
+            }
         }
+        private void ExtractAll()
+        {
+            StringBuilder errors = new StringBuilder();
+
+            var folder = GetFolder();
+            if(folder == "")
+            {
+                Log("Please choose a valid folder.", true);
+                return;
+            }
+
+            foreach (ListViewItem item in MainListView.Items)
+            {
+                try
+                {
+                    ExtractFile(item, false, folder);
+                }
+                catch (Exception ex)
+                {
+                    errors.AppendLine($"Failure to extract {item.Text} because {ex.Message}");
+                }
+            }
+
+            if (errors.Length > 0)
+            {
+                Log(errors.ToString(), true);
+            }
+        }
+
+        private string GetTempFolder()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "Protolumz");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            return path;
+        }
+        private void DeleteTempFolder()
+        {
+            var dir = GetTempFolder();
+            try
+            {
+                if (Directory.Exists(dir))
+                {
+                    Directory.Delete(dir, true);
+                }
+            }
+            catch { }
+        }
+        private string WriteTempFile(ListViewItem item)
+        {
+            string dir = GetTempFolder();
+            byte[] data;
+            string name;
+
+            if (item.Tag is FileInfo)
+            {
+                var file = item.Tag as FileInfo;
+                
+                if (file.Length > 1e+8)
+                {
+                    throw new Exception("file is larger than 100mbs");
+                }
+                name = file.Name;
+                data = File.ReadAllBytes(file.FullName);
+            }
+            else if (item.Tag is RcfEntry)
+            {
+                var entry = item.Tag as RcfEntry;
+                
+                if (entry.Length > 1e+8)
+                {
+                    throw new Exception("file is larger than 100mbs");
+                }
+                name = entry.Name;
+                data = entry.Owner.GetData(entry);
+            }
+            else return "";
+
+            var filename = Path.Combine(dir, name);
+            if (!File.Exists(filename))
+            {
+                File.WriteAllBytes(filename, data);
+            }
+
+            return filename;
+        }
+        private void CopyFile()
+        {
+            if (MainListView.SelectedItems.Count == 0) return;
+            try
+            {
+                DataObject dobj = new DataObject(DataFormats.FileDrop, WriteTempFile(MainListView.SelectedItems[0]));
+                Clipboard.SetDataObject(dobj);
+            }
+            catch(Exception ex)
+            {
+                Log($"Failure to copy {MainListView.SelectedItems[0].Text} because {ex.Message}", true);
+            }
+        }
+        private void DropFiles() 
+        {
+            StringBuilder errors = new StringBuilder();
+            List<string> filenames = new List<string>();
+
+            Cursor = Cursors.WaitCursor;
+            foreach (ListViewItem item in MainListView.SelectedItems)
+            {
+                try
+                {
+                    var filename = WriteTempFile(item);
+                    if (filename != "") filenames.Add(filename);
+                }
+                catch(Exception ex)
+                {
+                    errors.AppendLine($"Error extracting file {item.Text} because {ex.Message}");
+                }
+            }
+            Cursor = Cursors.Default;
+        
+            if(filenames.Count > 0)
+            {
+                DataObject dobj = new DataObject(DataFormats.FileDrop, filenames.ToArray());
+                DoDragDrop(dobj, DragDropEffects.Copy);
+            }
+            else 
+            {
+                if(errors.Length > 0)
+                {
+                    Log(errors.ToString(), true);
+                }
+            }
+        }
+
+
 
 
         //windows
@@ -791,18 +1005,16 @@ namespace Protolumz
             //for updating list view columns
             UpdateUI();
         }
-
-        private void MainTreeView_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        private void ExplorerForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            DeleteTempFolder();
         }
+
         private void MainTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            history.Add(SelectedNode);
             SelectedNode = e.Node;
             UpdateMainListView(GetListViewItems(SelectedNode));
-        }
-        private void MainTreeView_MouseUp(object sender, MouseEventArgs e)
-        {
-
         }
         private void MainListView_ItemActivate(object sender, EventArgs e)
         {
@@ -812,7 +1024,32 @@ namespace Protolumz
         {
             UpdateUI();
         }
-    
+        private void MainListView_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            var sorter = (MainListView.ListViewItemSorter as ListViewColumnSorter);
+            if (e.Column == sorter.SortColumn)
+            {
+                if (sorter.Order == SortOrder.Ascending)
+                {
+                    sorter.Order = SortOrder.Descending;
+                }
+                else
+                {
+                    sorter.Order = SortOrder.Ascending;
+                }
+            }
+            else
+            {
+                sorter.SortColumn = e.Column;
+                sorter.Order = SortOrder.Ascending;
+            }
+            this.MainListView.Sort();
+        }
+        private void MainListView_ItemDrag(object sender, ItemDragEventArgs e)
+        {
+            DropFiles();
+        }
+
         //form buttons
         private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -866,8 +1103,39 @@ namespace Protolumz
                 Search(SearchTextBox.Text);
             }
         }
+        private void consoleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (consoleForm != null)
+            {
+                consoleForm.Close();
+            }
+            consoleForm = new TextEditorForm(this, "Console Log", Encoding.ASCII.GetBytes(string.Join("\n", stringLog)));
+            consoleForm.Show(this);
+        }
+        private void exractAssetsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AssetExplorerForm form = new AssetExplorerForm(this, RcfMan);
+            form.Show(this);
+        }
+        private void assetExplorerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AssetExplorerForm form = new AssetExplorerForm(this, RcfMan);
+            form.Show(this);
+        }
+        private void setToSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetStartupFolder(PathTextBox.Text);
+        }
+        private void setToDefaultToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetStartupFolder(Path.GetDirectoryName(gameFolder));
+        }
 
         //list view context menu
+        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ViewFile();
+        }
         private void extractToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ExtractFile();
@@ -876,22 +1144,50 @@ namespace Protolumz
         {
             ExtractFile(true);
         }
-        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
+        private void extractAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ViewFile();
+            ExtractAll();
+        }
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CopyFile();
+        }
+        private void copyPathToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var path = "";
+            var name = MainListView.SelectedItems[0].Text;
+            if (SelectedNode.Tag is DirectoryInfo) 
+            {
+                path = (SelectedNode.Tag as DirectoryInfo).FullName;
+            }
+            if (SelectedNode.Tag is RcfDirectory) 
+            { 
+                path = (SelectedNode.Tag as RcfDirectory).FullNameWithOwner;
+            }
+            Clipboard.SetText(Path.Combine(path, name));
+        }
+        private void copyFileListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach(ListViewItem item in MainListView.Items)
+            {
+                if (item.Tag is FileInfo || item.Tag is RcfEntry)
+                {
+                    sb.AppendLine(item.Text);
+                }
+            }
+            Clipboard.SetText(sb.ToString());
         }
         private void openFileLocationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileLocation();
         }
-        private void copyFileListToolStripMenuItem_Click(object sender, EventArgs e)
+        private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var sb = new StringBuilder();
-            foreach(ListViewItem lvi in MainListView.Items)
+            foreach(ListViewItem item in MainListView.Items)
             {
-                sb.AppendLine(lvi.Text);
+                item.Selected = true;
             }
-            Clipboard.SetText(sb.ToString());
         }
 
         //tree node context menu

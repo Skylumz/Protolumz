@@ -28,6 +28,13 @@ namespace Protolumz
                 Properties.Settings.Default.Save();
             }
         }
+        private string gameExePath
+        {
+            get
+            { 
+                return Path.Combine(gameFolder, _exename);
+            }
+        }
 
         private RcfManager RcfMan = null;
 
@@ -81,14 +88,14 @@ namespace Protolumz
             }
             BringToFront();
 
-            this.Icon = Icon.ExtractAssociatedIcon(gameFolder);
+            this.Icon = Icon.ExtractAssociatedIcon(gameExePath);
             MainImageList.Images[0] = this.Icon.ToBitmap();
             MainListView.ListViewItemSorter = new ListViewColumnSorter();
 
             RcfMan = new RcfManager();
             Task.Run(() =>
             {
-                RcfMan.Init(Path.GetDirectoryName(gameFolder), UpdateStatus);
+                RcfMan.Init(gameFolder, UpdateStatus);
                 RefreshMainTreeView();
                 SetStartupFolder(Properties.Settings.Default.StartupFolder);
             });
@@ -99,7 +106,7 @@ namespace Protolumz
 
         private bool EnsureGameFolder()
         {
-            if (!gameFolder.Contains(_exename))
+            if (!Directory.Exists(gameFolder))
             {
                 bool isOk = false;
                 bool cancel = false;
@@ -482,7 +489,7 @@ namespace Protolumz
             else
             {
                 MainTreeView.Nodes.Clear();
-                AddMainTreeViewNode(Path.GetDirectoryName(gameFolder), "exeicon");
+                AddMainTreeViewNode(gameFolder, "exeicon");
                 MainTreeView.SelectedNode = MainTreeView.Nodes[0];
             }
         }
@@ -496,6 +503,7 @@ namespace Protolumz
             }
             else
             {
+                if(string.IsNullOrEmpty(folder)) { folder = MainTreeView.Nodes[0].Text; }
                 Properties.Settings.Default.StartupFolder = folder;
                 Properties.Settings.Default.Save();
                 StartUpFolderMenuItem.Text = new DirectoryInfo(folder).Name;

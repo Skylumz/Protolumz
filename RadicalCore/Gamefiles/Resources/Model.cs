@@ -216,6 +216,24 @@ namespace RadicalCore.Gamefiles
             return null;
         }
 
+        public string GetShaderName()
+        {
+            foreach (var node in Children)
+            {
+                if (node.Type == P3DNodeType.SkinnedMeshBuffers)
+                {
+                    SkinnedMeshBuffersNode meshnode = node as SkinnedMeshBuffersNode;
+                    return meshnode.ShaderName;
+                }
+                else if (node.Type == P3DNodeType.MeshBuffers)
+                {
+                    MeshBuffersNode meshnode = node as MeshBuffersNode;
+                    return meshnode.ShaderName;
+                }
+            }
+            return "";
+        }
+
         public override string ToString()
         {
             return string.Format("{0} - {1}", Type, Name);

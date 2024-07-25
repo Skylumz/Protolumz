@@ -173,7 +173,7 @@ namespace RadicalCore.Gamefiles
                     break;
             }
 
-            if (data == null) return data;
+            if (data == null) return null;
 
             var dr = new DataReader(new MemoryStream(NodeData));
             dr.Position = 20;

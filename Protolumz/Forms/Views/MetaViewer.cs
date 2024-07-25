@@ -13,13 +13,26 @@ namespace Protolumz
 {
     public partial class MetaViewer : UserControl, INodeView
     {
+        private MetaObjectDataNode viewNode;
+
         public MetaViewer()
         {
             InitializeComponent();
         }
 
-        public void LoadMeta(MetaData data)
+        public void LoadMeta()
         {
+            var data = viewNode.GetMeta();
+
+            if (data == null)
+            {
+                Label l = new Label();
+                l.Text = "Uknown Meta";
+                l.Location = new Point(10, 0);
+                Controls.Add(l);
+                return;
+            }
+
             var props = data.GetType().GetProperties();
             int y = 0;
             foreach(var prop in props)
@@ -34,8 +47,8 @@ namespace Protolumz
 
         public void LoadNode(P3DNode node)
         {
-            var meta = (node as MetaObjectDataNode).GetMeta();
-            LoadMeta(meta);
+            viewNode = (node as MetaObjectDataNode);
+            LoadMeta();
         }
     }
 }

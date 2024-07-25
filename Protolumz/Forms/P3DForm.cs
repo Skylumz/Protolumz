@@ -237,7 +237,7 @@ namespace Protolumz
 
         private void ExtractNodeData()
         {
-            var tag = SelectedNode.Tag;
+            var tag = SelectedNode.Tag; 
             if (tag is P3DNode)
             {
                 using (var sfd = new SaveFileDialog())
@@ -310,6 +310,7 @@ namespace Protolumz
         {
             StringBuilder errors = new StringBuilder();
             OBJFile obj = new OBJFile();
+            MTLFile mtl = new MTLFile();
 
             if (saveall)
             {
@@ -377,36 +378,105 @@ namespace Protolumz
                 }
             }
 
+            bool okSave = false;
+            string savePath = "";
+            string saveDirectory = "";
             using (var sfd = new SaveFileDialog())
             {
                 sfd.Filter = "OBJ File|*.obj";
                 sfd.FileName = obj.Name;
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    obj.Save(sfd.FileName);
+                    okSave = true;
+                    savePath = sfd.FileName;
+                    saveDirectory = Path.GetDirectoryName(savePath);
+                }
+                else
+                {
+                    MessageBox.Show("Failure to save");
+                    return;
                 }
             }
+            if (okSave == false) return;
+
+            foreach (var node in ActiveFile.Nodes)
+            {
+                if (node is ShaderNode)
+                {
+                    foreach (var child in node.Children)
+                    {
+                        if (child is ShaderParameterTextureNode)
+                        {
+                            var tnode = (child as ShaderParameterTextureNode);
+                            if (tnode.Name.TrimEnd() == "color\0\0\0")
+                            {
+                                var value = tnode.Value.Trim('\0');
+                                string mtlName = Path.Combine(saveDirectory, value);
+                                var newMat = MTL.GetBasic(mtlName);
+                                newMat.Name = (node as ShaderNode).Name;
+                                mtl.AddMaterial(newMat);
+                            }
+                        }
+                    }
+                }
+            }
+
+            SaveAllDDS(saveDirectory);
+            obj.Save(savePath);
+            string mtlFileName = savePath.Replace(".obj", ".mtl");
+            mtl.Save(mtlFileName);
+
+            MessageBox.Show("Exported: " + obj.Name + " to " + savePath);
         }
         //change to save actuall dds file
         private void SaveDDS()
         {
             if (!(SelectedNode.Tag is TextureNode)) return;
 
-            var texturenode = SelectedNode.Tag as TextureNode;
+            var textureNode = SelectedNode.Tag as TextureNode;
 
-            var data = DDSIO.GetDDSFile(texturenode);
+            var data = DDSIO.GetDDSFile(textureNode);
             if (data == null)
             {
-                MessageBox.Show("Failure to extract texture: " + texturenode.Name);
+                MessageBox.Show("Failure to extract texture: " + textureNode.Name);
                 return;
             }
 
             using(var sfd = new SaveFileDialog())
             {
-                sfd.FileName = texturenode.Name;
+                sfd.FileName = textureNode.Name;
                 if(sfd.ShowDialog() == DialogResult.OK)
                 {
                     File.WriteAllBytes(sfd.FileName, data);
+                }
+            }
+        }
+        private void SaveAllDDS(string saveDirectory)
+        {
+            foreach(var node in ActiveFile.Nodes)
+            {
+                if (node is TextureNode)
+                {
+                    var textureNode = (TextureNode)node;
+                    var data = DDSIO.GetDDSFile(textureNode);
+
+                    if(data == null)
+                    {
+                        MessageBox.Show("Failure to extract texture: " + textureNode.Name + " because null data.");
+                        continue;
+                    }
+
+                    if (Directory.Exists(saveDirectory))
+                    {
+                        var savePath = Path.Combine(saveDirectory, Path.GetFileName(textureNode.Name.Replace("\0", string.Empty)));
+                        File.WriteAllBytes(savePath, data);
+                        continue;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failure to extract texture: " + textureNode.Name + " because directory does not exist.");
+                        continue;
+                    }
                 }
             }
         }

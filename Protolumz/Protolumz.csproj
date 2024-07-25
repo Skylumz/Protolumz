@@ -110,6 +110,12 @@
     <Compile Include="Forms\Views\MetaViewer.Designer.cs">
       <DependentUpon>MetaViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Views\PropsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Views\PropsView.Designer.cs">
+      <DependentUpon>PropsView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Winforms\InputBox.cs" />
     <Compile Include="Forms\Winforms\ListViewSorter.cs" />
     <Compile Include="Forms\Winforms\SyncTextBox.cs">
@@ -146,6 +152,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Views\MetaViewer.resx">
       <DependentUpon>MetaViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Views\PropsView.resx">
+      <DependentUpon>PropsView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

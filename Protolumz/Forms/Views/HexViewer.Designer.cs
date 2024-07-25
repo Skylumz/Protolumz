@@ -55,15 +55,15 @@
             // 
             this.DecodedTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.DecodedTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.DecodedTextBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DecodedTextBox.Dock = System.Windows.Forms.DockStyle.Right;
             this.DecodedTextBox.HideSelection = false;
             this.DecodedTextBox.LinkedTextBoxes = null;
-            this.DecodedTextBox.Location = new System.Drawing.Point(200, 0);
+            this.DecodedTextBox.Location = new System.Drawing.Point(366, 0);
             this.DecodedTextBox.Multiline = true;
             this.DecodedTextBox.Name = "DecodedTextBox";
             this.DecodedTextBox.ReadOnly = true;
             this.DecodedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.DecodedTextBox.Size = new System.Drawing.Size(100, 506);
+            this.DecodedTextBox.Size = new System.Drawing.Size(206, 506);
             this.DecodedTextBox.TabIndex = 2;
             this.DecodedTextBox.Text = "................";
             // 
@@ -78,7 +78,7 @@
             this.HexTextBox.Multiline = true;
             this.HexTextBox.Name = "HexTextBox";
             this.HexTextBox.ReadOnly = true;
-            this.HexTextBox.Size = new System.Drawing.Size(100, 506);
+            this.HexTextBox.Size = new System.Drawing.Size(230, 506);
             this.HexTextBox.TabIndex = 1;
             // 
             // OffsetTextBox

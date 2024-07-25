@@ -75,6 +75,7 @@ namespace Protolumz
         public ExplorerForm()
         {
             InitializeComponent();
+            Size = new Size(1200, 800);
 
             Init();
         }

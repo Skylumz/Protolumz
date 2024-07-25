@@ -149,18 +149,16 @@ namespace RadicalCore.Gamefiles
     public class MetaObjectDataNode : P3DNode
     {
         public uint NodeDataLength { get; set; }
+        public uint Idenitifer { get; set; } //meta
         public byte[] NodeData { get; set; }
-        public uint Idenitifer { get; set; } //META
 
         public override void Read(DataReader dr)
         {
             base.Read(dr);
 
             NodeDataLength = dr.ReadUInt32();
-            NodeData = dr.ReadBytes((int)NodeDataLength);
-            dr.Position -= NodeDataLength;
             Idenitifer = dr.ReadUInt32();
-            dr.Position += NodeDataLength;
+            NodeData = dr.ReadBytes((int)NodeDataLength);
         }
 
         public MetaData GetMeta()
@@ -176,7 +174,6 @@ namespace RadicalCore.Gamefiles
             if (data == null) return null;
 
             var dr = new DataReader(new MemoryStream(NodeData));
-            dr.Position = 20;
             data.Read(dr);
 
             return data;

@@ -143,31 +143,94 @@ namespace RadicalCore.Gamefiles
 
         public List<Vector3> GetVertices()
         {
-            return GetVertexBufferNode().GetElement("position").Cast<Vector3>().ToList();
+            var vb = GetVertexBufferNode();
+            if(vb != null)
+            {
+                return vb.GetElement("position").Cast<Vector3>().ToList();
+            }
+            else
+            {
+                return new List<Vector3>();
+            }
+            //return GetVertexBufferNode().GetElement("position").Cast<Vector3>().ToList();
         }
         public List<Vector3> GetNormals()
         {
-            return GetVertexBufferNode().GetElement("normal").Cast<Vector3>().ToList();
+            var vb = GetVertexBufferNode();
+            if (vb != null)
+            {
+                return vb.GetElement("normal").Cast<Vector3>().ToList();
+            }
+            else
+            {
+                return new List<Vector3>();
+            }
+            //return GetVertexBufferNode().GetElement("normal").Cast<Vector3>().ToList();
         }
         public List<Vector3> GetTangents()
         {
-            return GetVertexBufferNode().GetElement("tangent").Cast<Vector3>().ToList();
+            var vb = GetVertexBufferNode();
+            if (vb != null)
+            {
+                return vb.GetElement("tangent").Cast<Vector3>().ToList();
+            }
+            else
+            {
+                return new List<Vector3>();
+            }
+            //return GetVertexBufferNode().GetElement("tangent").Cast<Vector3>().ToList();
         }
         public List<int> GetBoneWeights()
         {
-            return GetVertexBufferNode().GetElement("tangent").Cast<int>().ToList();
+            var vb = GetVertexBufferNode();
+            if (vb != null)
+            {
+                return vb.GetElement("tangent").Cast<int>().ToList();
+            }
+            else
+            {
+                return new List<int>();
+            }
+            //return GetVertexBufferNode().GetElement("tangent").Cast<int>().ToList();
         }
         public List<int> GetBoneIndices()
         {
-            return GetVertexBufferNode().GetElement("indices").Cast<int>().ToList();
+            var vb = GetVertexBufferNode();
+            if (vb != null)
+            {
+                return vb.GetElement("indices").Cast<int>().ToList();
+            }
+            else
+            {
+                return new List<int>();
+            }
+            //return GetVertexBufferNode().GetElement("indices").Cast<int>().ToList();
         }
         public List<Vector2> GetUVS(string layer = "tex0")
         {
-            return GetVertexBufferNode(true).GetElement(layer).Cast<Vector2>().ToList();
+            var vb = GetVertexBufferNode();
+            if (vb != null)
+            {
+                return vb.GetElement(layer).Cast<Vector2>().ToList();
+            }
+            else
+            {
+                return new List<Vector2>();
+            }
+            //return GetVertexBufferNode(true).GetElement(layer).Cast<Vector2>().ToList();
         }
         public List<int> GetColors(string layer = "colour0")
         {
-            return GetVertexBufferNode(true).GetElement(layer).Cast<int>().ToList();
+            var vb = GetVertexBufferNode(true);
+            if (vb != null)
+            {
+                return vb.GetElement(layer).Cast<int>().ToList();
+            }
+            else
+            {
+                return new List<int>();
+            }
+            //return GetVertexBufferNode(true).GetElement(layer).Cast<int>().ToList();
         }
 
         public List<int> GetIndices()
@@ -213,7 +276,7 @@ namespace RadicalCore.Gamefiles
                     return indnode.GetIndices();
                 }
             }
-            return null;
+            return new List<int>();
         }
 
         public string GetShaderName()

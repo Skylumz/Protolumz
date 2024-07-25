@@ -29,6 +29,7 @@ namespace Protolumz
         public P3DForm(ExplorerForm ef, string fp, byte[] data)
         {
             InitializeComponent();
+            Size = new Size(1200, 800);
 
             Owner = ef;
             Icon = Owner.Icon;
@@ -47,7 +48,7 @@ namespace Protolumz
                 BuildTree();
             });
         }
-
+        
         private void UpdateTitle()
         {
             if (InvokeRequired)
@@ -189,18 +190,12 @@ namespace Protolumz
             if (SelectedNode == null) return;
 
             var tag = SelectedNode.Tag;
+            MainPropertyGrid.SelectedObject = tag;
             if (tag is P3DNode)
             {
-                MainPropertyGrid.SelectedObject = (P3DNode)SelectedNode.Tag;
                 UpdateViewer(tag as P3DNode);
                 UpdateContextMenu();
             }
-            else if (tag is P3DFile)
-            {
-                MainPropertyGrid.SelectedObject = (P3DFile)SelectedNode.Tag;
-            }
-
-            
         }
         private void UpdateContextMenu()
         {
@@ -308,7 +303,7 @@ namespace Protolumz
 
         private void SaveOBJ(bool saveall = false)
         {
-            StringBuilder errors = new StringBuilder();
+            StringBuilder res = new StringBuilder();
             OBJFile obj = new OBJFile();
             MTLFile mtl = new MTLFile();
 
@@ -329,7 +324,7 @@ namespace Protolumz
                                 }
                                 catch (Exception ex)
                                 {
-                                    errors.AppendLine("Mesh: " + (childnode as MeshNode).Name + " unable to export because: " + ex.ToString());
+                                    res.AppendLine("Mesh: " + (childnode as MeshNode).Name + " unable to export because: " + ex.ToString());
                                 }
                             }
                             
@@ -353,7 +348,7 @@ namespace Protolumz
                             }
                             catch(Exception ex)
                             {
-                                errors.AppendLine("Mesh: " + (node as MeshNode).Name + " unable to export because: " + ex.ToString());
+                                res.AppendLine("Mesh: " + (node as MeshNode).Name + " unable to export because: " + ex.ToString());
                             }
                         }
                     }
@@ -368,13 +363,13 @@ namespace Protolumz
                     }
                     catch (Exception ex)
                     {
-                        errors.AppendLine("Mesh: " + meshnode.Name + " unable to export because: " + ex.ToString());
+                        res.AppendLine("Mesh: " + meshnode.Name + " unable to export because: " + ex.ToString());
                     }
                 }
 
-                if (errors.ToString().Length > 0)
+                if (res.ToString().Length > 0)
                 {
-                    MessageBox.Show("Errors encountered", errors.ToString());
+                    MessageBox.Show("Errors encountered", res.ToString());
                 }
             }
 
@@ -421,12 +416,12 @@ namespace Protolumz
                 }
             }
 
-            SaveAllDDS(saveDirectory);
+            res.AppendLine(SaveAllDDS(saveDirectory));
             obj.Save(savePath);
             string mtlFileName = savePath.Replace(".obj", ".mtl");
             mtl.Save(mtlFileName);
 
-            MessageBox.Show("Exported: " + obj.Name + " to " + savePath);
+            MessageBox.Show(res.ToString());
         }
         //change to save actuall dds file
         private void SaveDDS()
@@ -451,34 +446,46 @@ namespace Protolumz
                 }
             }
         }
-        private void SaveAllDDS(string saveDirectory)
+        private string SaveAllDDS(string saveDirectory)
         {
+            StringBuilder sb = new StringBuilder();
+
             foreach(var node in ActiveFile.Nodes)
             {
                 if (node is TextureNode)
                 {
-                    var textureNode = (TextureNode)node;
-                    var data = DDSIO.GetDDSFile(textureNode);
+                    try
+                    {
+                        var textureNode = (TextureNode)node;
+                        var data = DDSIO.GetDDSFile(textureNode);
 
-                    if(data == null)
-                    {
-                        MessageBox.Show("Failure to extract texture: " + textureNode.Name + " because null data.");
-                        continue;
-                    }
+                        if (data == null)
+                        {
+                            sb.AppendLine("Failure to extract texture: " + textureNode.Name + " because null data.");
+                            continue;
+                        }
 
-                    if (Directory.Exists(saveDirectory))
-                    {
-                        var savePath = Path.Combine(saveDirectory, Path.GetFileName(textureNode.Name.Replace("\0", string.Empty)));
-                        File.WriteAllBytes(savePath, data);
-                        continue;
+                        if (Directory.Exists(saveDirectory))
+                        {
+                            var savePath = Path.Combine(saveDirectory, Path.GetFileName(textureNode.Name.Replace("\0", string.Empty)));
+                            File.WriteAllBytes(savePath, data);
+                            sb.AppendLine("Successully extracted: " + textureNode.Name);
+                            continue;
+                        }
+                        else
+                        {
+                            sb.AppendLine("Failure to extract texture: " + textureNode.Name + " because directory does not exist.");
+                            continue;
+                        }
                     }
-                    else
+                    catch(Exception ex) 
                     {
-                        MessageBox.Show("Failure to extract texture: " + textureNode.Name + " because directory does not exist.");
-                        continue;
+                        sb.AppendLine($"{ex.Message}"); 
                     }
                 }
             }
+
+            return sb.ToString();
         }
 
         private void MainTreeView_AfterSelect(object sender, TreeViewEventArgs e)

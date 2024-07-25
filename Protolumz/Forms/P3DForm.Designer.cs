@@ -34,10 +34,16 @@
             this.extractDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extractCheckedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extractCombinedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.saveTextureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.oBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.MainStatusStrip = new System.Windows.Forms.StatusStrip();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
@@ -49,12 +55,6 @@
             this.DetailsTab = new System.Windows.Forms.TabPage();
             this.MainPropertyGrid = new System.Windows.Forms.PropertyGrid();
             this.ViewTab = new System.Windows.Forms.TabPage();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.saveTextureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.oBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.TreeViewContextMenu.SuspendLayout();
             this.MainMenuStrip.SuspendLayout();
             this.MainStatusStrip.SuspendLayout();
@@ -99,6 +99,24 @@
             this.extractCombinedToolStripMenuItem.Text = "Extract Combined";
             this.extractCombinedToolStripMenuItem.Click += new System.EventHandler(this.combinedToolStripMenuItem_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(166, 6);
+            // 
+            // saveTextureToolStripMenuItem
+            // 
+            this.saveTextureToolStripMenuItem.Name = "saveTextureToolStripMenuItem";
+            this.saveTextureToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.saveTextureToolStripMenuItem.Text = "Save Texture";
+            // 
+            // saveOBJToolStripMenuItem
+            // 
+            this.saveOBJToolStripMenuItem.Name = "saveOBJToolStripMenuItem";
+            this.saveOBJToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.saveOBJToolStripMenuItem.Text = "Save OBJ";
+            this.saveOBJToolStripMenuItem.Click += new System.EventHandler(this.saveOBJToolStripMenuItem_Click);
+            // 
             // MainMenuStrip
             // 
             this.MainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -122,9 +140,29 @@
             // openFileToolStripMenuItem
             // 
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.openFileToolStripMenuItem.Text = "Open File";
             this.openFileToolStripMenuItem.Click += new System.EventHandler(this.openFileToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(121, 6);
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            this.saveAsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.oBJToolStripMenuItem});
+            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.saveAsToolStripMenuItem.Text = "Save As";
+            // 
+            // oBJToolStripMenuItem
+            // 
+            this.oBJToolStripMenuItem.Name = "oBJToolStripMenuItem";
+            this.oBJToolStripMenuItem.Size = new System.Drawing.Size(94, 22);
+            this.oBJToolStripMenuItem.Text = "OBJ";
+            this.oBJToolStripMenuItem.Click += new System.EventHandler(this.oBJToolStripMenuItem_Click);
             // 
             // StatusLabel
             // 
@@ -212,8 +250,8 @@
             // 
             // MainTabControl
             // 
-            this.MainTabControl.Controls.Add(this.DetailsTab);
             this.MainTabControl.Controls.Add(this.ViewTab);
+            this.MainTabControl.Controls.Add(this.DetailsTab);
             this.MainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainTabControl.Location = new System.Drawing.Point(0, 0);
             this.MainTabControl.Name = "MainTabControl";
@@ -253,44 +291,6 @@
             this.ViewTab.TabIndex = 2;
             this.ViewTab.Text = "View";
             this.ViewTab.UseVisualStyleBackColor = true;
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
-            // 
-            // saveTextureToolStripMenuItem
-            // 
-            this.saveTextureToolStripMenuItem.Name = "saveTextureToolStripMenuItem";
-            this.saveTextureToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.saveTextureToolStripMenuItem.Text = "Save Texture";
-            // 
-            // saveOBJToolStripMenuItem
-            // 
-            this.saveOBJToolStripMenuItem.Name = "saveOBJToolStripMenuItem";
-            this.saveOBJToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.saveOBJToolStripMenuItem.Text = "Save OBJ";
-            this.saveOBJToolStripMenuItem.Click += new System.EventHandler(this.saveOBJToolStripMenuItem_Click);
-            // 
-            // saveAsToolStripMenuItem
-            // 
-            this.saveAsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.oBJToolStripMenuItem});
-            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.saveAsToolStripMenuItem.Text = "Save As";
-            // 
-            // oBJToolStripMenuItem
-            // 
-            this.oBJToolStripMenuItem.Name = "oBJToolStripMenuItem";
-            this.oBJToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.oBJToolStripMenuItem.Text = "OBJ";
-            this.oBJToolStripMenuItem.Click += new System.EventHandler(this.oBJToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // P3DForm
             // 

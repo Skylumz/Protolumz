@@ -1,4 +1,5 @@
-﻿using RadicalCore.Gamefiles;
+﻿using Protolumz.Forms.Views;
+using RadicalCore.Gamefiles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,27 +23,24 @@ namespace Protolumz
 
         public void LoadMeta()
         {
-            var data = viewNode.GetMeta();
+            MetaData data = viewNode.GetMeta();
 
-            if (data == null)
+            Control control = null;
+
+            if(data is PropRestoreArray)
+            {
+                var pv = new PropsView(data as PropRestoreArray);
+                control = pv;
+            }
+            else
             {
                 Label l = new Label();
                 l.Text = "Uknown Meta";
-                l.Location = new Point(10, 0);
-                Controls.Add(l);
-                return;
+                control = l;
             }
 
-            var props = data.GetType().GetProperties();
-            int y = 0;
-            foreach(var prop in props)
-            {
-                Label l = new Label();
-                l.Text = prop.Name;
-                l.Location = new Point(10, y);
-                y += 20;
-                Controls.Add(l);
-            }
+            control.Dock = DockStyle.Fill;
+            Controls.Add(control);
         }
 
         public void LoadNode(P3DNode node)
